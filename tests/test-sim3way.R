@@ -5,14 +5,16 @@ library(Dvar)
 #' First set the dimensionality and simulate histogram
 mydim = c(6, 2, 10)
 A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
+Nrep <- 2000
+bpar <- 1
 
 #' Run simulation with only total. I use only the total because the simulation
 #' function is not setup to take no margins.
 res <-
   Sim3Way(
-            Nrep = 2000,
+            Nrep = Nrep,
             intab = A,
-            bpar = 10,
+            bpar = bpar,
             marPack = list(list(0,0,0))
           )
 
@@ -43,9 +45,9 @@ for(i in 1:dim(marPackMatrix)[1]){
 #' Run simulation with full margins and total
 resFull <-
   Sim3Way(
-    Nrep = 2000,
+    Nrep = Nrep,
     intab = A,
-    bpar = 10,
+    bpar = bpar,
     marPack = marPack
 )
 
@@ -71,4 +73,6 @@ mean(res$mse)
 mean(resFull$mse)
 
 #' Much Better!
+hist(res$mse, breaks = 30)
+hist(resFull$mse, breaks = 30)
 
