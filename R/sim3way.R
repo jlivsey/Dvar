@@ -29,8 +29,8 @@ Sim3Way = function(Nrep, intab, bpar, marPack) {
 
   # Loop over marpack and add corresponding row to X and value to y
   for(i in 1:length(marPack)){
-    # extract i-th element from marPack and formulate as full vectors not NULL.
-    mar <- marginNull2vec(marPack[[1]], mydim = dim0)
+    # extract i-th element from marPack and formulate as full vectors not 0.
+    mar <- marginZero2vec(marPack[[i]], mydim = dim0)
     # Find next row for design matrix
     Zv <- c(arraySetOnes(mydim, mar))
     # Add to design matrix
