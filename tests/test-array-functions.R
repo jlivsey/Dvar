@@ -2,23 +2,18 @@
 mydim <- c(6, 2, 10)
 
 #' structure of single element of marPack
-mar <- 
-  list( 
-        NULL,
-        2,
-        NULL
-  )
+mar <- list(1:3, 0, 0)
 
 #' converter function if NULL is used for full dimension vector
-mar <- marginNull2(mar, mydim = mydim)
+marginZero2vec(mar, mydim = mydim)
 
 #' Simulate data
 A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
 Av <- c(A)
 
 #' margins to look at
-marPack <- list(list(NULL, 2, NULL), 
-                list(2, 2, NULL), 
+marPack <- list(list(NULL, 2, NULL),
+                list(2, 2, NULL),
                 list(4, NULL, NULL))
 
 # lets look at just the first mar from marPack
