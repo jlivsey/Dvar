@@ -12,7 +12,7 @@ res <-
   Sim3Way(
             Nrep = 2000,
             intab = A,
-            bpar = 1,
+            bpar = 10,
             marPack = list(list(0,0,0))
           )
 
@@ -45,7 +45,7 @@ resFull <-
   Sim3Way(
     Nrep = 2000,
     intab = A,
-    bpar = 1,
+    bpar = 10,
     marPack = marPack
 )
 
@@ -65,4 +65,10 @@ colnames(x) <- c("true",
                  "mse-full")
 print(x)
 
+#' Interestingly some of the estimates are not better with the full margins.
+#' Let's look at the average MSE of full vs no margins
+mean(res$mse)
+mean(resFull$mse)
+
+#' Much Better!
 
