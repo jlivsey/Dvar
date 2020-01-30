@@ -3,5 +3,4 @@
 export(Sim3Way)
 export(arrayEval)
 export(arraySetOnes)
-export(marginNull2vec)
-export(marginZero2null)
+export(marginZero2vec)
