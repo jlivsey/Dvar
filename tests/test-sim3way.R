@@ -1,12 +1,14 @@
 library(L1pack)
 library(Dvar)
 
+options(warn = -1)
+
 #' Lets look at simulation for same dimension as Age x sex x blockGroup
 #' First set the dimensionality and simulate histogram
 mydim = c(6, 2, 10)
 A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
 Nrep <- 2000
-bpar <- 1
+bpar <- 1/3
 
 #' Run simulation with only total. I use only the total because the simulation
 #' function is not setup to take no margins.
@@ -18,14 +20,14 @@ res <-
             marPack = list(list(0,0,0))
           )
 
-#' Look at the first 10 estimates, the true values and the MSE
+#' Look at the first 10 estimates, the true values and the rmse
 x <-
 cbind(
   c(A)[1:10],
   round(res$param[1:10], 4),
-  round(res$mse[1:10], 4)
+  round(res$rmse[1:10], 4)
 )
-colnames(x) <- c("true", "estimate", "mse")
+colnames(x) <- c("true", "estimate", "rmse")
 print(x)
 
 #' Construct marPack with all possible margins and total. This is ugly at the
@@ -56,23 +58,23 @@ x <-
   cbind(
     c(A)[1:10],
     round(res$param[1:10], 4),
-    round(res$mse[1:10], 4),
+    round(res$rmse[1:10], 4),
     round(resFull$param[1:10], 4),
-    round(resFull$mse[1:10], 4)
+    round(resFull$rmse[1:10], 4)
   )
 colnames(x) <- c("true",
                  "estimate-none",
-                 "mse-none",
+                 "rmse-none",
                  "estimate-full",
-                 "mse-full")
+                 "rmse-full")
 print(x)
 
 #' Interestingly some of the estimates are not better with the full margins.
-#' Let's look at the average MSE of full vs no margins
-mean(res$mse)
-mean(resFull$mse)
+#' Let's look at the average rmse of full vs no margins
+mean(res$rmse)
+mean(resFull$rmse)
 
 #' Much Better!
-hist(res$mse, breaks = 30)
-hist(resFull$mse, breaks = 30)
+hist(res$rmse, breaks = 30, main = "rmse with no margins")
+hist(resFull$rmse, breaks = 30, main = "rmse with full margins")
 

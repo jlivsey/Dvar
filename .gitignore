@@ -40,3 +40,5 @@ vignettes/*.pdf
 .Rproj.user
 .DS_Store
 tests/test-sim3way.pdf
+tests/test-sim3way.spin.R
+tests/test-sim3way.spin.Rmd

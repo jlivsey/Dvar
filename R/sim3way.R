@@ -67,11 +67,11 @@ Sim3Way = function(Nrep, intab, bpar, marPack) {
   mu = apply(coefEsts, 2, mean)
 
   # mean square error (will be output)
-  mse = (c(intab) - mu)^2
+  rmse = sqrt(apply(coefEsts^2,2,mean)-mu^2)
 
   # Return the following list
   return(list(
     param = mu,
-    mse   = mse
+    rmse  = rmse
   ))
 }
