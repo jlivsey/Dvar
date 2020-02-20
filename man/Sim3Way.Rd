@@ -4,7 +4,7 @@
 \alias{Sim3Way}
 \title{Replicate Laplace Noise for 3-way table}
 \usage{
-Sim3Way(Nrep, intab, bpar, marPack)
+Sim3Way(Nrep, intab, bpar, marPack, W = NULL)
 }
 \arguments{
 \item{Nrep}{Number of replication}
@@ -14,6 +14,8 @@ Sim3Way(Nrep, intab, bpar, marPack)
 \item{bpar}{Laplace noise parameter}
 
 \item{marPack}{list of lists of vectors with margins to put in model}
+
+\item{W}{(optional) weight vector of same length as d + length(marPack) = total number of predictors.}
 }
 \value{
 A list with the following:

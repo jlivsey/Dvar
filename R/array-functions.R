@@ -52,3 +52,55 @@ marginZero2vec <- function(mar, mydim = NULL, A = NULL){
   }
   return(mar)
 }
+
+
+
+# -----------------------------------------------------------------------------
+#' Recode or condense a marginal of histogram
+#'
+#' @param A array to be recoded
+#' @param margin margin that will be recoded
+#' @param newCode list of vectors that specify the recode
+#'
+#' @return recoded array
+#' @export
+#'
+recode <- function(A, margin, newCode){
+  d <- dim(A)
+  dl <- length(dim(A))
+  # dimension of recoded array
+  newd <- d
+  newd[margin] <- length(newCode)
+
+  # initialize empty mar object
+  mar <- vector(mode = 'list', length = dl)
+  for(i in 1:dl) mar[[i]] <- 1:d[i] # will change mar[[margin]] later
+
+  # loop over all newCodes
+  Aout <- array(NA, dim = newd)
+  for(i in 1:length(newCode)){
+    # create margin object for i^th newCode
+    mar[[margin]] <- newCode[[i]]
+
+    # WILL NEED TO BE CHANGED WHEN GENERALIZING TO MULTIPLE DIMENSIONS
+    # DON'T KNOW HOW TO HANDLE LHS OF THIS ASSIGNEMENT IN GENERAL.
+    Aout[,,i] <- apply(arrayEval(A, mar), (1:dl)[-margin], sum)
+  }
+  return(Aout)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
