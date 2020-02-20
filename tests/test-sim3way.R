@@ -78,3 +78,28 @@ mean(resFull$rmse)
 hist(res$rmse, breaks = 30, main = "rmse with no margins")
 hist(resFull$rmse, breaks = 30, main = "rmse with full margins")
 
+#' Test to see if weight vector is working
+weightVec <- rep(1, prod(mydim) + length(marPack))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

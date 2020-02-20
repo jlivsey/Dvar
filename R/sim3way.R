@@ -4,6 +4,7 @@
 #' @param intab True cell values
 #' @param bpar Laplace noise parameter
 #' @param marPack list of lists of vectors with margins to put in model
+#' @param W (optional) weight vector of same length as d + length(marPack) = total number of predictors.
 #'
 #' @return A list with the following:
 #' \itemize{
@@ -14,7 +15,7 @@
 #'
 
 
-Sim3Way = function(Nrep, intab, bpar, marPack) {
+Sim3Way = function(Nrep, intab, bpar, marPack, W = NULL) {
   # dimension of 'middle' of table. No margins
   dim0 = dim(intab)
   d <- prod(dim0) # total number of unknowns
@@ -26,6 +27,9 @@ Sim3Way = function(Nrep, intab, bpar, marPack) {
   #   elements of table for model.
   #   Will rbind margins within function
   X <- diag(d)
+
+  # If no weight matrix is passed initialize to all ones
+  if(is.null(W)) W <- rep(1, d + length(marPack))
 
   # Loop over marpack and add corresponding row to X and value to y
   for(i in 1:length(marPack)){
@@ -60,7 +64,7 @@ Sim3Way = function(Nrep, intab, bpar, marPack) {
       # setup dependent variable
       y <- y_true + noise[i, ]
       # Fit model and return estimated coefs
-      coefEsts[i,] = l1fit(X, y, int=F)$coef
+      coefEsts[i,] = l1fit(W*X, W*y, int=F)$coef
   }
 
   # Take mean of all param estimates (will be output)
