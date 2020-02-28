@@ -40,8 +40,7 @@ arraySetOnes <- function(arrayDim, idx){
 #'
 marginZero2vec <- function(mar, mydim = NULL, A = NULL){
   if(class(mar) != 'list'){
-    print('mar needs to be a list')
-    break
+    stop('mar needs to be a list')
   }
   if(!is.null(A)) mydim <- dim(A)
   zeroBool <- lapply(mar, function(x){x == 0})
