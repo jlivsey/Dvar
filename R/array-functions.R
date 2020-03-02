@@ -8,7 +8,7 @@
 #' @export
 #'
 arrayEval <- function(A, mar){
-  A[mar[[1]], mar[[2]], mar[[3]]]
+  A[mar[[1]], mar[[2]], mar[[3]], mar[[4]], mar[[5]], mar[[6]]]
 }
 
 
@@ -83,7 +83,7 @@ recode <- function(A, margin, newCode){
 
     # WILL NEED TO BE CHANGED WHEN GENERALIZING TO MULTIPLE DIMENSIONS
     # DON'T KNOW HOW TO HANDLE LHS OF THIS ASSIGNEMENT IN GENERAL.
-    Aout[,,i] <- apply(arrayEval(A, mar), (1:dl)[-margin], sum)
+    Aout[,,,,,i] <- apply(arrayEval(A, mar), (1:dl)[-margin], sum)
   }
   return(Aout)
 }
