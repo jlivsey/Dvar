@@ -3,5 +3,7 @@
 export(Sim3Way)
 export(arrayEval)
 export(arraySetOnes)
+export(geo_of_mar)
 export(marginZero2vec)
+export(query_of_mar)
 export(recode)
