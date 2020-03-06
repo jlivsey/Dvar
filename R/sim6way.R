@@ -1,4 +1,5 @@
-#' Replicate Laplace Noise for 3-way table
+#' Replicate Laplace Noise for 6-way table under the exact schema
+#' (hhgq, sex, Cenrace, age, hisp, geo).
 #'
 #' @param Nrep Number of replication
 #' @param intab True cell values
@@ -15,7 +16,7 @@
 #'
 
 
-Sim3Way = function(Nrep, intab, bpar, marPack, W = NULL) {
+Sim6Way = function(Nrep, intab, bpar, marPack, W = NULL) {
   # dimension of 'middle' of table. No margins
   dim0 = dim(intab)
   d <- prod(dim0) # total number of unknowns
