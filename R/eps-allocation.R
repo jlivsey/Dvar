@@ -27,16 +27,16 @@ geo_of_mar <- function(mar){
 #' @export
 #'
 query_of_mar <- function(mar){
-  zerosMar <- lapply(mar, function(x){x==0})
+  zerosMar <- lapply(mar, function(x){x[1]==0})
   zerosMar <- unlist(zerosMar)
-  if(zerosMar[2] == 0 &&
-     zerosMar[3] == 0 &&
-     zerosMar[4] == 0 &&
-     zerosMar[5] == 0 ){
+  if(zerosMar[2] == 1 &&
+     zerosMar[3] == 1 &&
+     zerosMar[4] == 1 &&
+     zerosMar[5] == 1 ){
     return("hhgq")
-  }else if(zerosMar[1] == 0 && zerosMar[2] == 0){
+  }else if(zerosMar[1] == 1 && zerosMar[2] == 1){
     return("votingAge_hisp_cenrace")
-  }else if(zerosMar[1] == 0 && zerosMar[3] == 0 && zerosMar[5] == 0){
+  }else if(zerosMar[1] == 1 && zerosMar[3] == 1 && zerosMar[5] == 1){
     return("age_sex")
   }else{
     return("detail")
