@@ -41,6 +41,7 @@ A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
   # Initialize epsilon modifier
   epsMod <- geoMod[3] * # tract
             queryMod[1] # detailed
+  epsMod <- rep(epsMod, d)
 
   # If no weight matrix is passed initialize to all ones
   if(is.null(W)) W <- rep(1, d + length(marPack))
@@ -76,20 +77,21 @@ A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
   # SANITY CHECK
   if( ndat != length(y_true) ) warning("ndat != length(y_true)")
 
-  # Noise for every replication and every covariate (including margins)
-  noise = array(rlaplace(Nrep*ndat, scale=bpar*sqrt(2)), c(Nrep,ndat))
-
   # initalize storage for cell estimates
   # each row is vectorized table estimates
-  coefEsts = array(0, c(Nrep, d))
+  coefEsts = matrix(0, c(Nrep, d))
 
   # Use l1fit( ) to get parameter estimates
-  for(i in 1:Nrep){
+  # for(i in 1:Nrep){
+    # Noise for ith replication
+    noise = rlaplace(ndat, epsMod * bpar*sqrt(2))
     # setup dependent variable
-    y <- y_true + epsMod * noise[i, ]
+    y <- y_true + noise
     # Fit model and return estimated coefs
-    coefEsts[i,] = l1fit(W*X, W*y, int=F)$coef
-  }
+tic()
+        coefEsts = l1fit(W*X, W*y, int=F)$coef
+toc()
+  # }
 
   # Take mean of all param estimates (will be output)
   mu = apply(coefEsts, 2, mean)
