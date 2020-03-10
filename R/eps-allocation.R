@@ -17,6 +17,27 @@ geo_of_mar <- function(mar){
   }
 }
 
+#' Convert geo character to epsilon modifier
+#'
+#' @param geoMod vector of modifier levels from largest to smallest in
+#'               geographic size
+#' @param geo character valued geography
+#'
+#' @return entry of geoMod associated with geo
+#' @export
+#'
+geoChar2geoMod <- function(geoMod, geo){
+  if(geo == "state"){
+    return(geoMod[1])
+  }else if(geo == "county"){
+    return(geoMod[2])
+  }else if(geo == "tract"){
+    return(geoMod[3])
+  }else{
+    stop("problem with geoChar2geoMod function - didn't enter a geo level")
+  }
+}
+
 
 #' Check query associated with a given margin
 #'
@@ -40,5 +61,27 @@ query_of_mar <- function(mar){
     return("age_sex")
   }else{
     return("detail")
+  }
+}
+
+#' Convert query character to epsilon modifier
+#'
+#' @param queryMod vector of modifier levels of query
+#' @param query character valued geography
+#'
+#' @return entry of geoMod associated with geo
+#' @export
+#'
+queryChar2queryMod <- function(queryMod, query){
+        if(query == "detailed"){
+                    return(queryMod[1])
+  }else if(query == "hhgq"){
+                    return(queryMod[2])
+  }else if(query == "votingAge_hisp_cenrace"){
+                    return(queryMod[3])
+  }else if(query == "age_sex"){
+                    return(queryMod[4])
+  }else{
+    stop("problem with geoChar2geoMod function - didn't enter a geo level")
   }
 }
