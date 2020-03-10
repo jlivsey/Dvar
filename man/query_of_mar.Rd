@@ -11,7 +11,7 @@ query_of_mar(mar)
 associated with hhgq, sex, cenrace, age, hisp in that order}
 }
 \value{
-
+query from ("detail", "hhgq", "votingAge_hist_cenrace", "age_sex")
 }
 \description{
 Check query associated with a given margin

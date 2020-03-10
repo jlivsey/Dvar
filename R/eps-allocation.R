@@ -44,7 +44,7 @@ geoChar2geoMod <- function(geoMod, geo){
 #' @param mar list of length 6 with first 1-5 elements being margins
 #'            associated with hhgq, sex, cenrace, age, hisp in that order
 #'
-#' @return
+#' @return query from ("detail", "hhgq", "votingAge_hist_cenrace", "age_sex")
 #' @export
 #'
 query_of_mar <- function(mar){
