@@ -23,7 +23,7 @@ arrayEval <- function(A, mar){
 #'
 arraySetOnes <- function(arrayDim, idx){
   Z <- array(0, arrayDim)
-  Z[idx[[1]], idx[[2]], idx[[3]]] <- 1
+  Z[idx[[1]], idx[[2]], idx[[3]], idx[[4]], idx[[5]], idx[[6]]] <- 1
   return(Z)
 }
 
