@@ -53,8 +53,6 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # Loop over marpack and add corresponding row to X and value to y
   for(i in 1:length(marPack)){
-    if(i < 10) print(i)
-    if(i%%100==0) print(round(i/length(marPack)*100, 1))
     # Check what geo and query are associated with i^th marginal
     # Need to do this now because expects 0 for totals
     g <- geo_of_mar(marPack[[i]])
@@ -80,7 +78,7 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # initalize storage for cell estimates
   # each row is vectorized table estimates
-  coefEsts = matrix(0, c(Nrep, d))
+  coefEsts = matrix(0, Nrep, d)
 
   # Generate noise for each run as col of matrix
   noise <- matrix(data = rlaplace(ndat*Nrep, epsMod * bpar * sqrt(2)),
@@ -89,10 +87,13 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # Use l1fit( ) to get parameter estimates
   for(i in 1:Nrep){
+    current_time <- Sys.time()
+    print(paste0("replication ", i, " starting at: ", current_time))
     # setup dependent variable
     y <- y_true + noise[, i]
     # Fit model and return estimated coefs
-    coefEsts = l1fit(W*X, W*y, int=F)$coef
+    coefEsts[i, ] = l1fit(W*X, W*y, int=F)$coef
+    save(coefEsts, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-16_PC.RData")
   }
 
   # Take mean of all param estimates (will be output)

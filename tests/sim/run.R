@@ -22,4 +22,4 @@ OUT <-
           geoMod = geoMod,
           queryMod = queryMod)
 
-save(OUT, file = "sim-results-2020-03-13.RData")
+# save(OUT, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-16.RData")
