@@ -93,7 +93,7 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
     y <- y_true + noise[, i]
     # Fit model and return estimated coefs
     coefEsts[i, ] = l1fit(W*X, W*y, int=F)$coef
-    save(coefEsts, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-16_PC.RData")
+    save(coefEsts, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-17_PC.RData")
   }
 
   # Take mean of all param estimates (will be output)
