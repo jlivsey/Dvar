@@ -11,11 +11,11 @@ queryMod <- c(.1, .2, .5, .2)
 
 #' True table
 mydim = c(2, 2, 7, 3, 2, 20)
-A <- array(sample(1:10, size = prod(mydim), replace = TRUE), mydim)
-
+set.seed(123)
+A <- array(sample(0:10, size = prod(mydim), replace = TRUE), mydim)
 
 OUT <-
-  Sim6Way(Nrep = 3,
+  Sim6Way(Nrep = 300,
           intab = A,
           bpar = bpar,
           marPack = marPack,
