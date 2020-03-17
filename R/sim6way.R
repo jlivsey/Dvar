@@ -78,7 +78,7 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # initalize storage for cell estimates
   # each row is vectorized table estimates
-  coefEsts = matrix(0, Nrep, d)
+  # coefEsts = matrix(0, Nrep, d)
 
   # Generate noise for each run as col of matrix
   noise <- matrix(data = rlaplace(ndat*Nrep, epsMod * bpar * sqrt(2)),
@@ -92,7 +92,13 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
     # setup dependent variable
     y <- y_true + noise[, i]
     # Fit model and return estimated coefs
-    coefEsts[i, ] = l1fit(W*X, W*y, int=F)$coef
+    if(i == 1){
+        coefEsts <- l1fit(W*X, W*y, int=F)$coef
+    }else{
+        new_coefEsts <- l1fit(W*X, W*y, int=F)$coef
+        coefEsts     <- rbind(coefEsts, new_coefEsts)
+    }
+
     save(coefEsts,
          file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-17_Mac.RData")
   }
