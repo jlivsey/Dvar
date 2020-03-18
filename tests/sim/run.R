@@ -10,9 +10,10 @@ geoMod <- c(.2, .5, .3)
 queryMod <- c(.1, .2, .5, .2)
 
 #' True table
-mydim = c(2, 2, 7, 3, 2, 20)
-set.seed(123)
-A <- array(sample(0:10, size = prod(mydim), replace = TRUE), mydim)
+# mydim = c(2, 2, 7, 3, 2, 20)
+# set.seed(123)
+# A <- array(sample(0:10, size = prod(mydim), replace = TRUE), mydim)
+load("~/github/Dvar/tests/sim/true-table.RData")
 
 OUT <-
   Sim6Way(Nrep = 300,
