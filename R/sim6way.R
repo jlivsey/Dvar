@@ -69,7 +69,7 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
     y_true[d+i] <- newY
     # Append epsilon modifier to match with y_true and specified margin
     epsMod_new <- geoChar2geoMod(geoMod, g) *
-      queryChar2queryMod(queryMod, q)
+                  queryChar2queryMod(queryMod, q)
     epsMod[d+i] <- epsMod_new
   }
 
@@ -99,21 +99,22 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
         coefEsts     <- rbind(coefEsts, new_coefEsts)
     }
 
-    save(coefEsts,
-         file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-17_Mac.RData")
+    # save(coefEsts,
+    #      file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-23_Mac_totalOnly.RData")
   }
 
   # Take mean of all param estimates (will be output)
-  mu = apply(coefEsts, 2, mean)
+  # mu = apply(coefEsts, 2, mean)
 
   # mean square error (will be output)
-  rmse = sqrt(apply(coefEsts^2,2,mean)-mu^2)
+  # rmse = sqrt(apply(coefEsts^2,2,mean)-mu^2)
 
   # Return the following list
-  return(list(
-    param = mu,
-    rmse  = rmse,
-    coefEsts = coefEsts,
-    noise = noise
-  ))
+  # return(list(
+  #   param = mu,
+  #   rmse  = rmse,
+  #   coefEsts = coefEsts,
+  #   noise = noise
+  # ))
+  return(coefEsts)
 }
