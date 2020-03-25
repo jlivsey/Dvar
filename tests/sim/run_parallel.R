@@ -3,10 +3,17 @@ library(L1pack)
 library(parallel)
 
 # load marPack object
-source('~/GitHub/Dvar/tests/sim/setup-marPack.R')
+# source('~/GitHub/Dvar/tests/sim/setup-marPack.R')
 # Need at least list of length 2 for code to run. This is minimum possible
 #    marginal information current sim6way can run with.
-marPack <- marPack[1:2]
+# marPack <- marPack[1:2]
+
+# marPack only including margins for outcome
+# [hhgq = hh, sex = M, cenRace = Wh, Age = 0-17, Hisp = hisp, Geo = 1]
+marPack = vector("list",3)
+marPack[[1]] <- list(1,0,0,0,0,1)
+marPack[[2]] <- list(0,0,1,1,1,1)
+marPack[[3]] <- list(0,1,0,1,0,1)
 
 # privacy budget parameters
 bpar <- 4
@@ -39,8 +46,8 @@ coefEsts <- mclapply(trials, run_sim6way, mc.cores = numCores)
 toc()
 
 # convert list object to matrix
-a <- matrix(unlist(coefEsts), ncol = length(coefEsts), byrow = TRUE)
+a <- matrix(unlist(coefEsts), ncol = 3360, byrow = TRUE)
 coefEsts <- a
 
 # save to directory
-save(coefEsts, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-23-noMar.RData")
+save(coefEsts, file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-24-specificCell.RData")

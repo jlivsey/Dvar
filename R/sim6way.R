@@ -87,8 +87,8 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # Use l1fit( ) to get parameter estimates
   for(i in 1:Nrep){
-    current_time <- Sys.time()
-    print(paste0("replication ", i, " starting at: ", current_time))
+    # current_time <- Sys.time()
+    # print(paste0("replication ", i, " starting at: ", current_time))
     # setup dependent variable
     y <- y_true + noise[, i]
     # Fit model and return estimated coefs
