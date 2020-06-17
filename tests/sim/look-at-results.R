@@ -1,8 +1,21 @@
+coefEsts <- coefEsts_tract1
+coefEsts <- coefEsts_tract1_county1
+
 # Take mean of all param estimates (will be output)
 mu = apply(coefEsts, 2, mean)
 
 # mean square error (will be output)
 rmse.cell = sqrt(apply(coefEsts^2,2,mean)-mu^2)
+r <- rmse.cell
+
+hist(r)
+tail(sort(r), 10)
+
+R <- array(r, c(2, 2, 7, 3, 2, 20))
+R1 <- R[, , , , , 1]
+
+max(R1)
+
 
 # histogram of of RMSE's
 my_rmse <- rmse[rmse < 2]
