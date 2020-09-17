@@ -8,13 +8,20 @@ mu = apply(coefEsts, 2, mean)
 rmse.cell = sqrt(apply(coefEsts^2,2,mean)-mu^2)
 r <- rmse.cell
 
+# look at output
 hist(r)
 tail(sort(r), 10)
 
+# convert RMSE to array
 R <- array(r, c(2, 2, 7, 3, 2, 20))
-R1 <- R[, , , , , 1]
 
-max(R1)
+# Find exact cell
+myIdx <- which.max(r)
+myIdx <- which(abs(r - tail(sort(r), 10)[8]) < .0001)
+Rbool <- array(FALSE, c(2,2,7,3,2,20))
+Rbool[myIdx] <- TRUE
+which(Rbool, arr.ind = TRUE)
+
 
 
 # histogram of of RMSE's
@@ -30,6 +37,22 @@ my_hist <- function(x, thresh = 10){
 my_hist(rmse.all, 2)
 my_hist(rmse.none, 2)
 my_hist(rmse.cell, 2)
+
+
+> which(Rbool, arr.ind = TRUE)
+dim1 dim2 dim3 dim4 dim5 dim6
+[1,]    1    2    6    2    2    2
+
+
+Rbool[1, 2, 6, 2, 2, 2] <- TRUE
+which(Rbool)
+
+
+coefEsts[, 303]
+
+
+
+
 
 
 
