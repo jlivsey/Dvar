@@ -39,9 +39,6 @@ is_end <- function(input.seq, max.seq){
 
 initialize_A <- function(J, I){
   A <- vector(mode = 'list', length = length(J))
-
-  # i <- 1
-
   for(i in 1:length(J)){
     n_categories <- I[J[[i]]]
     A[[i]] <- array(dim = n_categories)
@@ -80,16 +77,24 @@ fill_na <- function(Aa){
   flag <- TRUE
   if(nrow(na.list) == 1) flag <- FALSE
 
+  idx <- 0
+  na.flag <- TRUE
+  while(na.flag){
+    idx <- idx + 1
+    v <- na.list[idx, ]
+    # Update flag to FALSE if v is valid
+    end.dim <- which(full.dim == v)[1]
+    all.dim <- 1:length(full.dim)
+    fix.dim <- all.dim[-end.dim]
 
-    v <- na.list[1, ]
+    M <- matrix(ncol = length(v), nrow = v[end.dim] - 1)
+    for(i in 1:nrow(M)){
+      M[i, ][end.dim] <- i
+      M[i, ][fix.dim] <- v[fix.dim]
+    }
 
-  end.dim <- which(full.dim == v)
-  fix.dim <- which(full.dim != v)
-
-  M <- matrix(ncol = length(v), nrow = v[end.dim] - 1)
-  for(i in 1:nrow(M)){
-    M[i, ][end.dim] <- i
-    M[i, ][fix.dim] <- v[fix.dim]
+    # compare M to na.list
+    na.flag <- any(check_rows2(na.list, M))
   }
 
   # update NA element of array
@@ -107,6 +112,8 @@ A <- initialize_A(J, I)
 
 # Lets work on A[[6]] for now
 Aa <- A[[6]]
+
+na.list <- which(is.na(Aa), arr.ind = TRUE)
 
 
 flag <- TRUE
