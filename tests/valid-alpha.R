@@ -38,12 +38,11 @@ is_end <- function(input.seq, max.seq){
 
 
 initialize_A <- function(J, I){
-  n.J <- length(J)
-  A <- vector(mode = 'list', length = n.J)
+  A <- vector(mode = 'list', length = length(J))
 
   # i <- 1
 
-  for(i in 1:n.J){
+  for(i in 1:length(J)){
     n_categories <- I[J[[i]]]
     A[[i]] <- array(dim = n_categories)
     M <- matrix(ncol = length(n_categories))
@@ -52,63 +51,68 @@ initialize_A <- function(J, I){
     M[1, ] <- newrow
     while(!is_end(newrow, target)){
       newrow <- next_loop_seq(newrow, target)
-      M <- rbind(M, newrow)
+      M <- rbind(M, newrow) # binding to size. Allocate memory before
     }
     A[[i]][M] <- rnorm(nrow(M))
   }
   return(A)
 }
 
-A <- initialize_A(J, I)
 
-fill_empty <- function(Aarray, I){
+check_rows <- function(M, v){
+  bool_all_rows <- rowSums(M == v[col(M)]) == ncol(M)
+  return(sum(bool_all_rows) > 0)
+}
 
+check_rows2 <- function(M, v){
+  apply(v, 1, function(x) check_rows(B, x))
 }
 
 
-# Lets work on A[[6]] for now
+fill_na <- function(Aa){
 
-Aa <- A[[6]]
+  full.dim <- dim(Aa)
 
-full.dim <- dim(Aa)
-# [1] 3 4 5
+  na.list <- which(is.na(Aa), arr.ind = TRUE)
 
-na.list <- which(is.na(Aa), arr.ind = TRUE)
-# dim1 dim2 dim3
-# [1,]    3    1    1
-# [2,]    3    2    1
-# [3,]    3    3    1
+  print(nrow(na.list))
 
-possible_to_fill <- function(candidate, na.list){
+  flag <- TRUE
+  if(nrow(na.list) == 1) flag <- FALSE
 
-  candidate <- na.list[1, ]
 
-  idx_at_end <- which(candidate == full.dim)
-  next_value <- candidate[idx_at_end] - 1
-  other_rows <- candidate
-  other_rows[idx_at_end] <- next_value
-  while(next_value > 1){
-    next_value <- next_value - 1
-    new_row <- candidate
-    new_row[idx_at_end] <- next_value
-    other_rows <- rbind(other_rows, new_row)
+    v <- na.list[1, ]
+
+  end.dim <- which(full.dim == v)
+  fix.dim <- which(full.dim != v)
+
+  M <- matrix(ncol = length(v), nrow = v[end.dim] - 1)
+  for(i in 1:nrow(M)){
+    M[i, ][end.dim] <- i
+    M[i, ][fix.dim] <- v[fix.dim]
   }
 
-  # CHECK IF all rows in other_rows are in na.list --> return(TRUE/FALSE)
-  # Will need other_rows too
+  # update NA element of array
+  V <- matrix(v, nrow = 1)
+  Aa[V] <- -sum(Aa[M])
+
+  # # remove element from na.list
+  # na.list <- na.list[-1, ]
+
+  return(list(flag = flag, Aa = Aa))
 }
 
+# -----
+A <- initialize_A(J, I)
 
-Aa[candidate] <- -sum(Aa[other_rows])
-
-
-
-
-
+# Lets work on A[[6]] for now
+Aa <- A[[6]]
 
 
-
-
-
-
-
+flag <- TRUE
+while(flag){
+  out <- fill_na(Aa)
+  Aa <- out$Aa
+  # na.list <- out$na.list
+  flag <- out$flag
+}
