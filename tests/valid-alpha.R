@@ -7,7 +7,7 @@ library(survey)
 # ficticious setup: (sex, race, geo) categories
 #                      2,    2,   2  total levels in each category
 
-I <- c(3, 4, 5)
+I <- c(2, 3, 4, 5)
 
 J <- list()
 J[[1]] <- 1
@@ -15,7 +15,7 @@ J[[2]] <- 2
 J[[3]] <- 3
 J[[4]] <- c(1,2)
 J[[5]] <- c(2, 3)
-J[[6]] <- c(1, 2, 3)
+J[[6]] <- c(1, 2, 3, 4)
 
 next_loop_seq = function(input.seq, max.seq){
   N = length(input.seq)
@@ -70,13 +70,15 @@ fill_na <- function(Aa){
 
   full.dim <- dim(Aa)
 
+  # list of all NA element of Aa
   na.list <- which(is.na(Aa), arr.ind = TRUE)
-
   print(nrow(na.list))
 
+  # Overall flag to exit while loop when completed filling in Aa
   flag <- TRUE
   if(nrow(na.list) == 1) flag <- FALSE
 
+  # Find element v that can be filled in
   idx <- 0
   na.flag <- TRUE
   while(na.flag){
@@ -100,9 +102,6 @@ fill_na <- function(Aa){
   # update NA element of array
   V <- matrix(v, nrow = 1)
   Aa[V] <- -sum(Aa[M])
-
-  # # remove element from na.list
-  # na.list <- na.list[-1, ]
 
   return(list(flag = flag, Aa = Aa))
 }
