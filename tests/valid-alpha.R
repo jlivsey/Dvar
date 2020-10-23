@@ -7,7 +7,7 @@ library(survey)
 # ficticious setup: (sex, race, geo) categories
 #                      2,    2,   2  total levels in each category
 
-I <- c(2, 3, 4, 5)
+I <- c(2, 3, 4)
 
 J <- list()
 J[[1]] <- 1
@@ -15,7 +15,7 @@ J[[2]] <- 2
 J[[3]] <- 3
 J[[4]] <- c(1,2)
 J[[5]] <- c(2, 3)
-J[[6]] <- c(1, 2, 3, 4)
+J[[6]] <- c(1, 2, 3)
 
 next_loop_seq = function(input.seq, max.seq){
   N = length(input.seq)
@@ -62,7 +62,7 @@ check_rows <- function(M, v){
 }
 
 check_rows2 <- function(M, v){
-  apply(v, 1, function(x) check_rows(B, x))
+  apply(v, 1, function(x) check_rows(M, x))
 }
 
 
