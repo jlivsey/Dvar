@@ -1,13 +1,17 @@
 
 # JLivsey Meeting Notes  10/23/2020
 
+# Returns list of all possible combinations
 all_subtuples = function(v) {
-         A = NULL
-         for(j in 1:(length(v)-1))
-             A = c(A, as.list(data.frame(combn(v,j))))
-         A }
+    A = NULL
+    for(j in 1:(length(v)-1)){
+        A = c(A, as.list(data.frame(combn(v,j))))
+    }
+    return(A)
+}
 
 Aexmp1 = all_subtuples(1:4)
+Aexmp1
 
 Algth = split(1:length(Aexmp1), sapply(Aexmp1,length))
 
