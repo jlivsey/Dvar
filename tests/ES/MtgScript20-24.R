@@ -1,8 +1,11 @@
 
+
+
 ## MATERIAL ADDED 10/24/2020 FF
-==========================
+#==========================
 
   ### The steps above are embodied in the following complete package function.
+source("tests/ES/MtgScript10-23.R")
 
   ## In this segment, J is a list of tuples subsets (containing distinct elements) of 1:K,
   ##   ASSUME (can check later if desired) that entries of J are ordered
@@ -20,7 +23,7 @@ Jcheck = function(Jlist) {  ### apply only if max(sapply(Jlist,length)) > 1
     ###    hash-coded (k-1)-tuples of all k-tuples in J
     ### and check if there are some not in the hash-codes jhash[jbylgth[[k-1]]]
     Jvalid=TRUE
-    if(lmax>1) for (k in setdiff(as.numeric(names(jbylgth)),1)) {
+    if(lmax>1) for (k in setdiff(as.numeric(names(jbylgth)),1))     {
       oldhash = jhash[jbylgth[[as.character(k-1)]]]
       tmphash = NULL
       for ( i in jbylgth[[as.character(k)]] )
@@ -110,16 +113,29 @@ Jcheck(c(Jalt2,list(c(1,3,6))))
     Anew = Atmp
     expr0.ch = c("Anew[",rep(",", dim1-1))
     expr1.ch = NULL
-    if(dim1<nd)
-      for(i in (dim1+1):nd) expr1.ch = c(expr1.ch,", 1:",Idim[i]-1)
+    if(dim1<nd){
+      for(i in (dim1+1):nd){
+        expr1.ch = c(expr1.ch,", 1:",Idim[i]-1)
+      }
+    }
     NAfill.nam = paste( c(expr0.ch, Idim[dim1], expr1.ch,
                           "]"), collapse="")
     FillArr.nam = paste( c(expr0.ch, "1:",
-                           Idim[dim1]-1, expr1.ch, ", drop=F]"), collapse="")
-    eval( str2expression( paste( NAfill.nam, "<- apply(", FillArr.nam,
-                                 ", setdiff(1:nd,",dim1,
-                                 "), function(arr) -sum(arr))", collapse="")))
-    list(Anew=Anew, dim.new=dim1+1, nam1=NAfill.nam, nam2=FillArr.nam)
+                           Idim[dim1]-1,
+                           expr1.ch,
+                           ", drop=F]"), collapse="")
+    eval( str2expression( paste( NAfill.nam,
+                                 "<- apply(",
+                                 FillArr.nam,
+                                 ", setdiff(1:nd,",
+                                 dim1,
+                                 "), function(arr) -sum(arr))",
+                                 collapse="")))
+    #return
+    list(Anew=Anew,
+         dim.new=dim1+1,
+         nam1=NAfill.nam,
+         nam2=FillArr.nam)
   }
 
 Atmp0 = array(c(1,NA,1,NA,NA,NA), c(2,3))
