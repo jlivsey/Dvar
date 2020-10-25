@@ -72,7 +72,7 @@ fill_na <- function(Aa){
 
   # list of all NA element of Aa
   na.list <- which(is.na(Aa), arr.ind = TRUE)
-  print(nrow(na.list))
+  # print(nrow(na.list))
 
   # Overall flag to exit while loop when completed filling in Aa
   flag <- TRUE
