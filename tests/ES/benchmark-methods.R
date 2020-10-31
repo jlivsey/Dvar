@@ -25,3 +25,10 @@ m <- microbenchmark(ericMethod,
                     jimMethod,
                     times = 1000)
 m
+
+
+
+m2 <- microbenchmark(all_subtuples_eric(1:1000),
+                     all_subtouples_jim(1:1000),
+                     times = 10)
+m2
