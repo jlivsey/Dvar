@@ -7,15 +7,16 @@ library(survey)
 # ficticious setup: (sex, race, geo) categories
 #                      2,    2,   2  total levels in each category
 
-I <- c(2, 3, 4)
+I <- c(2, 3, 4, 5)
 
 J <- list()
 J[[1]] <- 1
 J[[2]] <- 2
 J[[3]] <- 3
 J[[4]] <- c(1,2)
-J[[5]] <- c(2, 3)
-J[[6]] <- c(1, 2, 3)
+J[[5]] <- c(1, 3)
+J[[6]] <- c(2, 3)
+J[[7]] <- c(1, 2, 3)
 
 next_loop_seq = function(input.seq, max.seq){
   N = length(input.seq)
@@ -109,16 +110,41 @@ fill_na <- function(Aa){
 # -----
 A <- initialize_A(J, I)
 
-# Lets work on A[[6]] for now
-Aa <- A[[6]]
+# # Lets work on A[[6]] for now
+# Aa <- A[[6]]
+#
+# na.list <- which(is.na(Aa), arr.ind = TRUE)
+#
+#
+# flag <- TRUE
+# while(flag){
+#   out <- fill_na(Aa)
+#   Aa <- out$Aa
+#   # na.list <- out$na.list
+#   flag <- out$flag
+# }
 
-na.list <- which(is.na(Aa), arr.ind = TRUE)
+
+# ---- Loop over all A, get complete A list ----
+
+for(i in 1:length(A)){
+  # Lets work on A[[6]] for now
+  Aa <- A[[i]]
+
+  na.list <- which(is.na(Aa), arr.ind = TRUE)
 
 
-flag <- TRUE
-while(flag){
-  out <- fill_na(Aa)
-  Aa <- out$Aa
-  # na.list <- out$na.list
-  flag <- out$flag
+  flag <- TRUE
+  while(flag){
+    out <- fill_na(Aa)
+    Aa <- out$Aa
+    # na.list <- out$na.list
+    flag <- out$flag
+  }
+
+  A[[i]] <- Aa
+
 }
+
+
+
