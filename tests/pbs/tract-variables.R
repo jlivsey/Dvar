@@ -15,6 +15,24 @@ head(pbd_dat)
 # ---- All tracts in Virginia ----
 # have non-hispanic white alone but do not have hispanic white alone (subtract?)
 
+# "HWA_MALE", "HWA_FEMALE",   --> TOTAL_POP - NH_White_alone_CEN_2010
+# "NHWA_MALE", "NHWA_FEMALE", --> NH_White_alone_CEN_2010
+# "HBA_MALE", "HBA_FEMALE",   --> TOTAL_POP - NH_Blk_alone_CEN_2010
+# "NHBA_MALE", "NHBA_FEMALE", --> NH_Blk_alone_CEN_2010
+# "HAA_MALE", "HAA_FEMALE",   --> TOTAL_POP - NH_Asian_alone_CEN_2010
+# "NHAA_MALE", "NHAA_FEMALE", --> NH_Asian_alone_CEN_2010
+# "HIA_MALE", "HIA_FEMALE",   --> TOTAL_POP - NH_AIAN_alone_CEN_2010
+# "NHIA_MALE", "NHIA_FEMALE", --> NH_AIAN_alone_CEN_2010
+# "HNA_MALE", "HNA_FEMALE",   --> TOTAL_POP - NH_NHOPI_alone_CEN_2010
+# "NHNA_MALE", "NHNA_FEMALE", --> NH_NHOPI_alone_CEN_2010
+# "H_MALE"  ,   "H_FEMALE",   --> Hispanic_CEN_2010
+# "NH_MALE",   "NH_FEMALE",  --> TOTAL_POP - Hispanic_CEN_2010
+# "HTOM_MALE","HTOM_FEMALE",
+# "NHTOM_MALE","NHTOM_FEMALE"
+#
+#
+# Additional --> NH_SOR_alone_CEN_2010 ("some other race")
+
 data_url2 = "https://api.census.gov/data/2019/pdb/tract?get=State_name,Tot_Population_ACS_13_17,NH_White_alone_CEN_2010,NH_Blk_alone_CEN_2010,NH_Asian_alone_CEN_2010,NH_NHOPI_alone_CEN_2010,NH_SOR_alone_CEN_2010,Hispanic_CEN_2010,County_name&for=tract:*&in=state:51&in=county:*&key=25488af6841e29e4b76b5e8fb877ea0d4ae2a017"
 
 json_data <- fromJSON(data_url2)
@@ -59,7 +77,7 @@ va = tracts(state = "Virginia", county = "Culpeper", year = 2016) %>%
   st_as_sf() %>%
   st_transform(crs = 3857)
 
-#' # Join data and Shape data
+# Join data and Shape data
 va_dat <- dat %>%
   inner_join(va, by = c('GEOID' = 'GEOID'))
 
