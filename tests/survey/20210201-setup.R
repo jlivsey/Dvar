@@ -61,12 +61,19 @@ infram <- data.frame(Intercept = as.factor(rep(1, 12)),
 
 contrasts(infram$male)[as.numeric(infram$male), ]
 
+fac <- as.factor(sample(x = 1:7, size = 30, replace = TRUE))
+contrasts(fac)
+contrasts(fac)[as.numeric(fac), ]
+
 # Livsey - this matches the setup I have for infram
 
-demoFram = infram
+demoFram <- infram %>%
+  select(Intercept, male, own, young, midage) %>%
+  mutate(male = as.numeric(male)-1) %>%
+  mutate(own = as.numeric(own)-1) %>%
+  mutate(young = as.numeric(young)-1) %>%
+  mutate(midage = as.numeric(midage)-1)
 
-
-#
 # The simplest situation is one where the categorical variables in "infram" are not formed from any common constituent variables (as would happen e.g. if one was AgeGroup x Race and another Education x Race). If that happens then the "contrasts" code-step above when done on all categorical variables would result in linearly dependent columns in the matrix formed from the "demoFram" data-frame appearing below as an argument in the "svydesign" function, and that might cause problems so that you would have to remove redundant columns from the matrix and also corresponding entries from the "totvec" vector.
 #
 # Assume that the "infram" data-frame has 1 record for each desired cell of the contingency table, in the desired scanning order as the table entries viewed as a multi-way array.
@@ -76,9 +83,11 @@ demoFram = infram
 #   Syntax for (ii) [for a survey or table without structure related to weighting]:
 #
 
-Basewt = rep(500/12, 12)
+N = 500
+Basewt = rep(N/12, 12)
 
 tmpdsgn = svydesign(~1, data=demoFram, weights=~Basewt)
+
 #
 # In our examples, the column "Basewt" should contain all entries equal to N/ncell , where ncell is the total number of cells in our contingency table, and N is the desired table total.
 #
@@ -86,6 +95,9 @@ tmpdsgn = svydesign(~1, data=demoFram, weights=~Basewt)
 #
 # Zmat = data.matrix(demoFram[,c("(Intercept)", paste0("V",1:16)])
 Zmat = data.matrix(demoFram)
+Zmat
+
+# Zmat = [intercept, nonref-male/female, ]
 #
 #                             are the columns for which you want to have  sum(final.wts*col) = totvec .  The vector "totvec" will generally start by containing totals for a national population, with the first entry equal to the national pop total. The dimension of "totvec" should match the column dimension of Zmat (including initial column of 1's).
 #
@@ -97,8 +109,9 @@ Zmat = data.matrix(demoFram)
 N = 500
 # totvec = sum(final.wts*col)
 # totvec = totvec*(N/totvec[1])
-totvec = N * c(1, .5, .5, .25, .75, .3, .5, .2)
+totvec = N * c(1, .5, .25, .3, .5)
 names(totvec) = dimnames(Zmat)[[2]]
+names(totvec)[1] = "(Intercept)"
 #
 #     (iv) Apply the "calibrate" function in the R package "survey" to do the calibration:
 #
@@ -109,10 +122,14 @@ names(totvec) = dimnames(Zmat)[[2]]
 raked.obj <-
   calibrate(
     design = tmpdsgn,
-    formula =   formula(paste("~", paste0( names(totvec)[-1], collapse="+"))),            population = totvec,
+    formula = formula(paste("~", paste0( names(totvec)[-1], collapse="+"))),
+    population = totvec,
     calfun="raking"
   )
 #
 # Finally the component in the output list "raked.obj" that you want as a set of "final adjusted weights" to populate the table whose entries correspond to the rows of "infram" is:   1/raked.obj$prob
 
 1/raked.obj$prob
+
+# CHECK - Recover table totals by factor level
+as.numeric(1/raked.obj$prob) %*% data.matrix(demoFram)
