@@ -1,4 +1,5 @@
 library(survey)
+library(tidyverse)
 
 # (i) Define a data-frame including variables with names (that are non-empty but can be meaningless like V1-V50) consisting of linearly independent columns, the first of which is a column of all 1's, whose weighted totals will be raked to totals supplied in a vector. The column of 1's can be called "(Intercept)" (but may not need a name); all the other nonredundant columns being used in the calibration MUST have names that I assume below are V1-V16.
 
