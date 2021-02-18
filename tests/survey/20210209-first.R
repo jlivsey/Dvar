@@ -1,4 +1,6 @@
 library(survey)
+library(tidyverse)
+library(reshape2)
 
 # (i) Define a data-frame including variables with names (that are non-empty but can be meaningless like V1-V50) consisting of linearly independent columns, the first of which is a column of all 1's, whose weighted totals will be raked to totals supplied in a vector. The column of 1's can be called "(Intercept)" (but may not need a name); all the other nonredundant columns being used in the calibration MUST have names that I assume below are V1-V16.
 
@@ -19,6 +21,19 @@ own = factor(rep(0:1, n.full/2), labels = c("own" , "rent"))
 rac = factor(rep(0:3, n.full/4))
 geo = factor(rep(0:6, n.full/7))
 sexgeo = interaction(sex, geo)
+
+# Are all rows unique ?
+df <- data.frame(sex, own, rac, geo, sexgeo)
+df %>%
+  group_by_all() %>%
+  summarise(COUNT = n())
+
+df <- melt(A)
+v = df[1, -ncol(df)]
+class(v)
+class(v[1])
+v[1] == 'male'
+as.character(v[1])
 
 
 n.col = (2-1)*(2-1)*(4-1)*(7-1)
@@ -97,6 +112,8 @@ demoFram = infram
 
 contrasts(sexgeo)[as.numeric(sexgeo),  ]
 contrasts(geo)
+
+
 
 # The simplest situation is one where the categorical variables in "infram" are not formed from any common constituent variables (as would happen e.g. if one was AgeGroup x Race and another Education x Race). If that happens then the "contrasts" code-step above when done on all categorical variables would result in linearly dependent columns in the matrix formed from the "demoFram" data-frame appearing below as an argument in the "svydesign" function, and that might cause problems so that you would have to remove redundant columns from the matrix and also corresponding entries from the "totvec" vector.
 #
