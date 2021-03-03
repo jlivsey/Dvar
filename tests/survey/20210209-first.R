@@ -23,7 +23,7 @@ geo = factor(rep(0:6, n.full/7))
 sexgeo = interaction(sex, geo)
 
 # Are all rows unique ?
-df <- data.frame(sex, own, rac, geo, sexgeo)
+df <- data.frame(sex, own, rac, geo)
 df %>%
   group_by_all() %>%
   summarise(COUNT = n())
