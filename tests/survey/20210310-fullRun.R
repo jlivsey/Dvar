@@ -40,14 +40,14 @@ Zmat
 totvec <-
   N *
   c(
-     1,            # intercept
-    .5,           # own
-    .5,            # sex
-    rep(.15, 6), # race
-    .3, .3, # age
-    .5,   # hisp
-    rep(.0475, 19), #geo
-    rep(.025, 39)   # race x geo
+     1,             # intercept
+    .5,             # own
+    .5,             # sex
+    rep(1/7, 6),    # race
+    1/3, 1/3,       # age
+    .5,             # hisp
+    rep(1/20, 19),  # geo
+    rep(1/40, 39)   # sex x geo
   )
 
 # Sanity check
