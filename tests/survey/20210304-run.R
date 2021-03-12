@@ -34,14 +34,16 @@ Zmat
 
 
 totvec = N * c(
-                1,                     # intercept
-               .5,                     # sex
-               .25,                    # own
-               .1, .1, .5,             # race
-               .1, .1, .1, .1, .1, .1, # geo
-               rep(.05, 13)            # race x geo
+                1,            # intercept
+               .5,            # sex
+               .25,           # own
+               .25, .25, .25, # race
+               rep(.15, 6),   # geo
+               rep(.07, 13)   # race x geo
               )
 
+# Sanity check
+length(totvec) == ncol(demoFram)
 
 # reduce totvec for linearly dependent columns in DemoFram
 # Check that my colIdxSet has same length as QR-rank
@@ -70,4 +72,4 @@ raked.obj <-
 1/raked.obj$prob
 
 # CHECK - Recover table totals by factor level
-as.numeric(1/raked.obj$prob) %*% data.matrix(demoFram)
+as.numeric(1/raked.obj$prob) %*% data.matrix(demoFramReduced)
