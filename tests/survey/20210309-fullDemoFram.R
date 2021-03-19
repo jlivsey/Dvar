@@ -16,13 +16,15 @@ rac = factor(rep(0:6, n/7),   labels = c("wh", "bl", "as", "aian", "pac", "oth",
 age = factor(rep(0:2, n/3),   labels = c("0-17", "18-62", "62p"))
 his = factor(rep(0:1, n/2),   labels = c("hisp", "nonhips"))
 geo = factor(rep(0:19, n/20), labels = paste0(rep("tr", 20), 1:20))
+asx = interaction(age, sex)
 sxg = interaction(sex, geo)
+ahr = interaction(age, his, rac)
 
 
-dfA <- melt(A)
+dfA <- reshape2::melt(A)
 head(dfA)
 
-demoFram = matrix(nrow = nrow(dfA), ncol = 1+1+6+2+1+19+39)
+demoFram = matrix(nrow = nrow(dfA), ncol = 1+1+6+2+1+19+5+39+41)
 
 for(i in 1:nrow(dfA)){
 
@@ -31,7 +33,9 @@ for(i in 1:nrow(dfA)){
 
   # Need to use value of sex[v[1]] and geo[v[4]] to put together the correct
   #    row of the sexgeo contrast form needed
-  sexgeoChar = paste(sex[v[2]], geo[v[6]], sep = ".")
+  asxChar = paste(age[v[4]], sex[v[2]], sep = ".")
+  sxgChar = paste(sex[v[2]], geo[v[6]], sep = ".")
+  ahrChar    = paste(age[v[4]], his[v[5]], rac[v[3]], sep = ".")
 
   demoFram[i, ] <- c(
     contrasts(own)[v[1], ],
@@ -40,7 +44,9 @@ for(i in 1:nrow(dfA)){
     contrasts(age)[v[4], ],
     contrasts(his)[v[5], ],
     contrasts(geo)[v[6], ],
-    contrasts(sxg)[sexgeoChar, ]
+    contrasts(asx)[agesexChar, ],
+    contrasts(sxg)[sexgeoChar, ],
+    contrasts(ahr)[ahrChar, ]
   )
 
 }
