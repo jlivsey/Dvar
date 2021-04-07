@@ -57,39 +57,39 @@ dat <- pbd_dat %>%
   filter(County_name %in% county_list)
 
 
-# ---- Quick look at estimates ----
-library(tigris)
-library(sf)
-
-dat <- pbd_dat %>%
-  filter(County_name %in% "Culpeper County") %>%
-  select(NH_Asian_alone_CEN_2010, County_name, state, county, tract) %>%
-  tidyr::unite(GEOID, state,county,tract, sep="", remove=TRUE) %>%
-  mutate(GEOID = as.character(GEOID)) %>%
-  mutate(NH_Asian_alone_CEN_2010 = as.numeric(as.character(NH_Asian_alone_CEN_2010))) %>%
-  mutate(NAME = as.character(County_name)) %>%
-#  mutate(NAME = substring(NAME, 1, nchar(NAME)-10)) %>%
-  mutate(NAME = gsub(NAME, pattern = " County", replacement = ""))
-head(dat)
-
-# read in Virginia counties shape file
-va = tracts(state = "Virginia", county = "Culpeper", year = 2016) %>%
-  st_as_sf() %>%
-  st_transform(crs = 3857)
-
-# Join data and Shape data
-va_dat <- dat %>%
-  inner_join(va, by = c('GEOID' = 'GEOID'))
-
-
-#' Quick plots of the merged data.
-library(ggplot2)
-g1 <- ggplot(va_dat) +
-  geom_sf(colour = "black", size = 0.05, aes(fill = NH_Asian_alone_CEN_2010)) +
-  scale_fill_distiller("HHI", palette = "RdYlBu") +
-  ggtitle("NH_Asian_alone_CEN_2010", subtitle = "Culpeper County") +
-  theme_bw()
-print(g1)
+#' # ---- Quick look at estimates ----
+#' library(tigris)
+#' library(sf)
+#'
+#' dat <- pbd_dat %>%
+#'   filter(County_name %in% "Culpeper County") %>%
+#'   select(NH_Asian_alone_CEN_2010, County_name, state, county, tract) %>%
+#'   tidyr::unite(GEOID, state,county,tract, sep="", remove=TRUE) %>%
+#'   mutate(GEOID = as.character(GEOID)) %>%
+#'   mutate(NH_Asian_alone_CEN_2010 = as.numeric(as.character(NH_Asian_alone_CEN_2010))) %>%
+#'   mutate(NAME = as.character(County_name)) %>%
+#' #  mutate(NAME = substring(NAME, 1, nchar(NAME)-10)) %>%
+#'   mutate(NAME = gsub(NAME, pattern = " County", replacement = ""))
+#' head(dat)
+#'
+#' # read in Virginia counties shape file
+#' va = tracts(state = "Virginia", county = "Culpeper", year = 2016) %>%
+#'   st_as_sf() %>%
+#'   st_transform(crs = 3857)
+#'
+#' # Join data and Shape data
+#' va_dat <- dat %>%
+#'   inner_join(va, by = c('GEOID' = 'GEOID'))
+#'
+#'
+#' #' Quick plots of the merged data.
+#' library(ggplot2)
+#' g1 <- ggplot(va_dat) +
+#'   geom_sf(colour = "black", size = 0.05, aes(fill = NH_Asian_alone_CEN_2010)) +
+#'   scale_fill_distiller("HHI", palette = "RdYlBu") +
+#'   ggtitle("NH_Asian_alone_CEN_2010", subtitle = "Culpeper County") +
+#'   theme_bw()
+#' print(g1)
 
 
 
