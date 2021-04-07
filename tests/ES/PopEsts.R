@@ -12,7 +12,7 @@
 
 # Details:
 
-PopEstVA = read.csv("cc-est2019-alldata-51.csv")
+PopEstVA = read.csv("data/cc-est2019-alldata-51.csv")
 dim(PopEstVA)
 # [1] 30324    80
 names(PopEstVA)
@@ -73,8 +73,13 @@ XtrCty = XtrCty[,VarSet]
 dim(XtrCty)
 # [1] 133  28
 
-### Now create an array
+# Copied from ES .rlog file
+CTYnum <- c(660,  47,  83, 670, 113, 133, 163)        ### but counties are in alphabetical
+### order in original file with
+### all counties before all cities
+CTYnum = sort(CTYnum)
 
+### Now create an array
 XtrArr = array(data.matrix(XtrCty),
               c(19,7,2,2,7),
               dimnames=list(paste0("Agegp",0:18),
