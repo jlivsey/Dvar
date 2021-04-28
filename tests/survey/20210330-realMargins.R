@@ -15,11 +15,18 @@ dimnames(XtrArr)
 
 # Sex margins
 prop.table(apply(XtrArr, 3, sum))
-prop.table(apply(XtrArr[, "Culpeper County", , ,], 2, sum))
+prop.table(apply(XtrArr[,"Culpeper County", , ,], 2, sum))
 
 # Hisp margins
 dimnames(XtrArr[, "Culpeper County", , ,])
 prop.table(apply(XtrArr[, "Culpeper County", , ,], 3, sum))
+
+# Sex X Geo margins
+dimnames(XtrArr)
+prop.table(apply(XtrArr, 2:3, sum))
+
+
+
 
 county_list <- c(
   "Culpeper County",
@@ -41,7 +48,8 @@ x2 <- x %>%
 
 # ---- PDB --------------------------------------------------------------------
 # Load PBD data
-source('tests/pbs/tract-variables.R')
+source('tests/PDB/tract-variables.R')
+source('~/github/Dvar/tests/PDB/pdb2array.R')
 
 # Hispanicity margin from PBD
 # Need to be consistant with ACS_13_17 or CEN_2010 !!!
