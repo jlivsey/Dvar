@@ -83,7 +83,7 @@ CTYnum = sort(CTYnum)
 XtrArr = array(data.matrix(XtrCty),
               c(19,7,2,2,7),
               dimnames=list(paste0("Agegp",0:18),
-                                    paste0("Cty",CTYnum),
+                                    county_list,
                                     c("M","F"),
                                     c("Hsp","NH"),
                                     c("WA","BA","AA","IA","NPIA","Tot","2+"))

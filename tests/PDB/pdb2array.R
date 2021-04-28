@@ -1,5 +1,6 @@
 # Convert PDB data into array
 # similar to tests/ES/PopEst.R
+library(tidyverse)
 
 county_list <-
   c("Culpeper County",
@@ -18,9 +19,42 @@ x <- x_orig %>%
   filter(County_name %in% county_list)
 
 y <- x %>%
-  filter(County_name == "Culpeper County") %>%
-  select()
-View(y)
+  # filter(County_name == "Culpeper County") %>%
+  filter(County_name %in% county_list) %>%
+  mutate(geoid = paste0(County, Tract), .before = "County") %>%
+  select(geoid,
+         total = Tot_Population_CEN_2010,
+         hisp = Hispanic_CEN_2010,
+         nhwa = NH_White_alone_CEN_2010,
+         nhba = NH_Blk_alone_CEN_2010,
+         nhaa = NH_Asian_alone_CEN_2010,
+         nhia = NH_AIAN_alone_CEN_2010,
+         nhpa = NH_NHOPI_alone_CEN_2010,
+         nhoa = NH_SOR_alone_CEN_2010
+         ) %>%
+  mutate(nh2p = total - hisp - nhwa - nhba - nhaa - nhia - nhpa - nhoa) %>%
+  select(-total) %>%
+  filter_at(vars(-geoid), any_vars(. != 0)) # remove any rows of all zeros
+
+#' Only category missing for partion of population is race 2+.
+#' Note - we cannot make full Hisp X race cross tab since only hisp total
+#'        is available in PDB
+#' (nonhisp_wht_alone, nonhisp_blk_alone, nonhisp_asian_alone,
+#' nonhisp_aian_alone, nonhisp_nhpi_alone, nonhisp_other_alone
+#' nonhisp_2+, hisp)
+
+n_tracts = y$geoid %>%
+  unique() %>%
+  length()
+
+### Now create an array of tract x raceEthnicity
+x_arr = array(data = data.matrix(y),
+              dim  =  c(n_tracts, ),
+              dimnames = list(paste0("Agegp",0:18),
+                              paste0("Cty",CTYnum),
+                              c("M","F"),
+                              c("Hsp","NH"),
+                              c("WA","BA","AA","IA","NPIA","Tot","2+")))
 
 
 # ---- Sex margin ----
