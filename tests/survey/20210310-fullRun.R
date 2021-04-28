@@ -98,9 +98,9 @@ totvec <-
     .5,             # sex
     rac_tarWts[-1], # race
     1/3, 1/3,       # age
-    hisp_tarWts[1], # hisp
+    1 - hisp_tarWts[1], # hisp
     geo_tarWts[-1],  # geo
-    raceHisp_geo_tarWts[-1]   # raceHisp x geo
+    t(raceHisp_geo_tarWts)[-1]   # raceHisp x geo
   )
 
 # Sanity check
