@@ -1,8 +1,10 @@
 library(survey)
 library(tidyverse)
 library(reshape2)
+library(tictoc)
 
 source("tests/survey/20210309-fullDemoFram.R")
+source('tests/survey/20210410-raceHisp-tarWts.R')
 
 # N = size of population
 # n = # cells in full cross
@@ -20,7 +22,6 @@ tmpdsgn = svydesign(~1, data=demoFramReduced, weights=~Basewt)
 #
 # Zmat = data.matrix(demoFram[,c("(Intercept)", paste0("V",1:16)])
 Zmat = data.matrix(demoFramReduced)
-Zmat
 
 # Zmat = [intercept, nonref-male/female, ]
 #
@@ -35,19 +36,71 @@ Zmat
 # totvec = sum(final.wts*col)
 # totvec = totvec*(N/totvec[1])
 
+raceHisp_geo_tarWts <- raceHisp_x_geo %>%
+  select(-geoid) %>%
+  prop.table() %>%
+  data.matrix()
+  # as.numeric() %>%
+  # round(6)
+
+geo_tarWts <- raceHisp_geo_tarWts %>%
+  # select(-geoid) %>%
+  # data.matrix() %>%
+  rowSums()
+
+hisp_tarWts <- raceHisp_geo_tarWts %>%
+  # select(-geoid) %>%
+  # data.matrix() %>%
+  colSums()
+
+rac_tarWts <- hisp_tarWts[-1] %>%
+  prop.table()
+
+# weight and location for hisp entrys of raceHisp x geo
+hisp_wt <- (1/2) * (1/43)
+hisp_loc <- grepl("hisp", colnames(contrasts(rhg)))
+
+# weight for Non-hisp entrys of raceHisp x geo
+nonhisp_wt <- (1/14) * (1/43)
+nonhisp_loc <- !hisp_loc
+
+# Create wt vector for raceHisp x geo
+raceHisp_geo_equalWts <- rep(hisp_wt, ncol(contrasts(rhg)))
+raceHisp_geo_equalWts[nonhisp_loc] <- nonhisp_wt
 
 
+# ---- Equal Wts ----
+totvec <-
+  N *
+  c(
+    1,              # intercept
+    .5,             # own
+    .5,             # sex
+    rep(1/7, 6),    # race
+    1/3, 1/3,       # age
+    1/2,            # hisp
+    rep(1/43, 42),  # geo
+    #rep(1/6, 5),    # age x sex
+    #rep(1/86, 85),  # sex x geo
+    #rep(1/28, 27),   # own x race x hispanicty
+    #rep(1/903, 902) # race x age x geo
+    # rep(1/14, 13)    # race x hisp
+    #rep(1/14, 7) # collapsed race x hisp into (hisp, ...)
+    raceHisp_geo_equalWts    # raceHisp x geo
+  )
+
+# ---- Realistic Wts ----
 totvec <-
   N *
   c(
      1,             # intercept
     .5,             # own
     .5,             # sex
-    rep(1/7, 6),    # race
+    rac_tarWts[-1], # race
     1/3, 1/3,       # age
-    .5,             # hisp
-    rep(1/20, 19),  # geo
-    rep(1/40, 39)   # sex x geo
+    hisp_tarWts[1], # hisp
+    geo_tarWts[-1],  # geo
+    raceHisp_geo_tarWts[-1]   # raceHisp x geo
   )
 
 # Sanity check
@@ -67,6 +120,8 @@ names(totvecReduced)[1] = "(Intercept)"
 #
 #   raked.obj = calibrate(tmpdsgn,  formula(paste("~", paste0( names(totvec)[-1], collapse="+"))), totvec, calfun="raking")
 
+tic()
+
 raked.obj <-
   calibrate(
     design = tmpdsgn,
@@ -74,6 +129,9 @@ raked.obj <-
     population = totvecReduced,
     calfun="raking"
   )
+
+toc()
+
 #
 # Finally the component in the output list "raked.obj" that you want as a set of "final adjusted weights" to populate the table whose entries correspond to the rows of "infram" is:   1/raked.obj$prob
 
