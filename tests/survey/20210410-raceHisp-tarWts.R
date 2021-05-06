@@ -35,3 +35,25 @@ raceHisp_x_geo <- x %>%
   mutate(nh2p = total - hisp - nhwa - nhba - nhaa - nhia - nhpa - nhoa) %>%
   select(-total) %>%
   filter_at(vars(-geoid), any_vars(. != 0)) # remove any rows of all zeros
+
+
+temp_x <- x %>%
+  # filter(County_name == "Culpeper County") %>%
+  filter(County_name %in% county_list) %>%
+  mutate(geoid = paste0(County, Tract), .before = "County") %>%
+  select(County_name, County, Tract, geoid,
+         total = Tot_Population_CEN_2010,
+         hisp = Hispanic_CEN_2010,
+         nhwa = NH_White_alone_CEN_2010,
+         nhba = NH_Blk_alone_CEN_2010,
+         nhaa = NH_Asian_alone_CEN_2010,
+         nhia = NH_AIAN_alone_CEN_2010,
+         nhpa = NH_NHOPI_alone_CEN_2010,
+         nhoa = NH_SOR_alone_CEN_2010
+  ) %>%
+  mutate(nh2p = total - hisp - nhwa - nhba - nhaa - nhia - nhpa - nhoa) %>%
+  select(-total) %>%
+  filter_at(vars(-geoid, -County_name, -Tract, -County), any_vars(. != 0)) # remove any rows of all zeros
+
+
+xtable::xtable(temp_x)
