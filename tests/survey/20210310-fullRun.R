@@ -136,6 +136,31 @@ toc()
 # Finally the component in the output list "raked.obj" that you want as a set of "final adjusted weights" to populate the table whose entries correspond to the rows of "infram" is:   1/raked.obj$prob
 
 1/raked.obj$prob
+pt = prop.table(1 / raked.obj$prob)
 
 # CHECK - Recover table totals by factor level
-as.numeric(1/raked.obj$prob) %*% data.matrix(demoFramReduced)
+tabTot <- as.numeric(1/raked.obj$prob) %*% data.matrix(demoFramReduced)
+dim(tabTot)
+
+
+# Create synthetic data.frame
+xv = rmultinom(n = 1, size = N, prob = pt)
+
+(n  = prod(dim(A)))
+(N  = 20*n)
+xA = array(xv, dim = c(2, 2, 7, 3, 2, n_tracts))
+dimnames(xA)[[1]] <- c("own", "rnt")
+dimnames(xA)[[2]] <- c("mal", "fem")
+dimnames(xA)[[3]] <- c("wh", "bl", "as", "aian", "pac", "oth", "twp")
+dimnames(xA)[[4]] <- c("0-17", "18-62", "62p")
+dimnames(xA)[[5]] <- c("hisp", "nonhisp")
+dimnames(xA)[[6]] <- paste0(rep("tr", n_tracts), 1:n_tracts)
+
+# Save synthetic population
+# A <- xA
+# save(A, file = "tests/sim/20210429-sim/true-table.Rdata")
+
+
+
+
+
