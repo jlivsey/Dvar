@@ -46,3 +46,4 @@ tests/sim/RMSE-all.pdf
 tests/sim/RMSE-none.pdf
 data/pdb2020trv2_us.csv
 data/pdb2020trv2_us.zip
+tests/qr-test.pdf
