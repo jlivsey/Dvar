@@ -135,8 +135,13 @@ is_eigen_zero <- function(M, thresh = 10^-8){
 nc = qr(demoFram)$rank
 nc
 
+Q = qr(demoFram)$qr[1:397, 1:397]
+h = which(abs(diag(Q)) < 10^-8)
+
 # Full set of column indices. Will remove those which are linearly dependent
 colIdxSet <- 1:ncol(demoFram)
+
+tic()
 
 i = 2
 while( i <= length(colIdxSet)){
@@ -152,6 +157,8 @@ while( i <= length(colIdxSet)){
 
   i = i + 1 # Only increase i if all columns are linearly indep
 }
+
+toc()
 
 # Check that my colIdxSet has same length as QR-rank
 length(colIdxSet) == nc

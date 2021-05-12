@@ -23,29 +23,29 @@ stateRecode[1, ] <- c(1, 28)
 stateRecode[2, ] <- c(29, 43)
 
 # setup marPack
-marPack = vector("list",1044)
+marPack = vector("list", 1873)
 
 idx <- 1
 
-# ---- HHGQ --------------------------------------------------------------------
+# ---- Own/rent --------------------------------------------------------------------
 
-# Add HHGQ margins at tract level
-for(i in 1:2){
-  for(j in 1:20){
+# Add Own/rent margins at tract level
+for(i in 1:2){     # own/rent
+  for(j in 1:43){  # tract
     marPack[[idx]] <- list(i, 0, 0, 0, 0, j)
     idx <- idx + 1
   }
 }
-# Add HHGQ margins at county level
-for(i in 1:2){
-  for(j in 1:7){
+# Add Own/rent margins at county level
+for(i in 1:2){    # own/rent
+  for(j in 1:7){  # county
     marPack[[idx]] <- list(i, 0, 0, 0, 0, countyRecode[j, 1]:countyRecode[j, 2])
     idx <- idx + 1
   }
 }
-# Add HHGQ margins at state level
-for(i in 1:2){
-  for(j in 1:2){
+# Add Own/rent margins at state level
+for(i in 1:2){   # own/rent
+  for(j in 1:2){ # state
     marPack[[idx]] <- list(i, 0, 0, 0, 0, stateRecode[j, 1]:stateRecode[j, 2])
     idx <- idx + 1
   }
@@ -54,7 +54,7 @@ for(i in 1:2){
 # ---- Age x Sex ---------------------------------------------------------------
 
 # Add margins at tract level
-for(i in 1:20){ # tract levels
+for(i in 1:43){ # tract levels
   for(j in 1:3){ # age levels
     for(k in 1:2){ # sex levels
       marPack[[idx]] <- list(0, k, 0, j, 0, i)
@@ -88,7 +88,7 @@ votingAgeRecode <- rbind(c(1, 1),
                          c(2, 3))
 
 # Add margins at tract level
-for(i in 1:20){ # tract levels
+for(i in 1:43){ # tract levels
   for(j in 1:2){ # voting age levels
     for(k in 1:2){ # hisp levels
       for(el in 1:7){ # cenRace levels

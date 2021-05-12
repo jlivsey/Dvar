@@ -136,7 +136,7 @@ toc()
 # Finally the component in the output list "raked.obj" that you want as a set of "final adjusted weights" to populate the table whose entries correspond to the rows of "infram" is:   1/raked.obj$prob
 
 1/raked.obj$prob
-pt = prop.table(1 / raked.obj$prob)
+pt = prop.table(raked.obj$prob)
 
 # CHECK - Recover table totals by factor level
 tabTot <- as.numeric(1/raked.obj$prob) %*% data.matrix(demoFramReduced)
