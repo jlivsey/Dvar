@@ -56,4 +56,4 @@ temp_x <- x %>%
   filter_at(vars(-geoid, -County_name, -Tract, -County), any_vars(. != 0)) # remove any rows of all zeros
 
 
-xtable::xtable(temp_x)
+# xtable::xtable(temp_x)

@@ -135,30 +135,33 @@ is_eigen_zero <- function(M, thresh = 10^-8){
 nc = qr(demoFram)$rank
 nc
 
-Q = qr(demoFram)$qr[1:397, 1:397]
-h = which(abs(diag(Q)) < 10^-8)
 
 # Full set of column indices. Will remove those which are linearly dependent
 colIdxSet <- 1:ncol(demoFram)
 
-tic()
+# Use Erics method of fitting linear model and checking for NA coefs to
+#   determine the set of linearly independent columns of demoFram
+fit       <- lm( runif(nrow(demoFram)) ~ demoFram - 1)
+rmIdxSet  <-   which(is.na(fit$coefficients))
+colIdxSet <- which(!is.na(fit$coefficients))
+names(rmIdxSet)  <- NULL
+names(colIdxSet) <- NULL
 
-i = 2
-while( i <= length(colIdxSet)){
+# i = 2
+# while( i <= length(colIdxSet)){
+#
+#   # print(i)
+#
+#   subMat = demoFram[, colIdxSet[1:i]]
+#
+#   if(is_eigen_zero(subMat)){
+#     colIdxSet = colIdxSet[-i]
+#     next # don't increase i since you removed a column
+#   }
+#
+#   i = i + 1 # Only increase i if all columns are linearly indep
+# }
 
-  # print(i)
-
-  subMat = demoFram[, colIdxSet[1:i]]
-
-  if(is_eigen_zero(subMat)){
-    colIdxSet = colIdxSet[-i]
-    next # don't increase i since you removed a column
-  }
-
-  i = i + 1 # Only increase i if all columns are linearly indep
-}
-
-toc()
 
 # Check that my colIdxSet has same length as QR-rank
 length(colIdxSet) == nc
