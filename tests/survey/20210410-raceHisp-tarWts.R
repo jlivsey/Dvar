@@ -13,6 +13,7 @@ county_list <-
   )
 
 x_orig <- read.csv("data/pdb2020trv2_us.csv")
+# x_orig <- read.csv("data/cc-est2019-alldata-51.csv")
 
 x <- x_orig %>%
   filter(State_name == "Virginia") %>%
