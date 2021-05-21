@@ -23,19 +23,20 @@ stateRecode[1, ] <- c(1, 28)
 stateRecode[2, ] <- c(29, 43)
 
 # setup marPack
-marPack = vector("list", 1872)
+# marPack = vector("list", 1872)
+marPack = list()
 
 idx <- 1
 
 # ---- Own/rent --------------------------------------------------------------------
 
-# Add Own/rent margins at tract level
-for(i in 1:2){     # own/rent
-  for(j in 1:43){  # tract
-    marPack[[idx]] <- list(i, 0, 0, 0, 0, j)
-    idx <- idx + 1
-  }
-}
+# # Add Own/rent margins at tract level
+# for(i in 1:2){     # own/rent
+#   for(j in 1:43){  # tract
+#     marPack[[idx]] <- list(i, 0, 0, 0, 0, j)
+#     idx <- idx + 1
+#   }
+# }
 # Add Own/rent margins at county level
 for(i in 1:2){    # own/rent
   for(j in 1:7){  # county
@@ -53,15 +54,15 @@ for(i in 1:2){   # own/rent
 
 # ---- Age x Sex ---------------------------------------------------------------
 
-# Add margins at tract level
-for(i in 1:43){ # tract levels
-  for(j in 1:3){ # age levels
-    for(k in 1:2){ # sex levels
-      marPack[[idx]] <- list(0, k, 0, j, 0, i)
-      idx <- idx + 1
-    }
-  }
-}
+# # Add margins at tract level
+# for(i in 1:43){ # tract levels
+#   for(j in 1:3){ # age levels
+#     for(k in 1:2){ # sex levels
+#       marPack[[idx]] <- list(0, k, 0, j, 0, i)
+#       idx <- idx + 1
+#     }
+#   }
+# }
 # Add margins at county level
 for(i in 1:7){ # county levels
   for(j in 1:3){ # age levels
@@ -87,19 +88,19 @@ for(i in 1:2){ # state levels
 votingAgeRecode <- rbind(c(1, 1),
                          c(2, 3))
 
-# Add margins at tract level
-for(i in 1:43){ # tract levels
-  for(j in 1:2){ # voting age levels
-    for(k in 1:2){ # hisp levels
-      for(el in 1:7){ # cenRace levels
-        marPack[[idx]] <- list(0, 0, el,
-                               votingAgeRecode[j, 1]:votingAgeRecode[j, 2],
-                               k, i)
-        idx <- idx + 1
-      }
-    }
-  }
-}
+# # Add margins at tract level
+# for(i in 1:43){ # tract levels
+#   for(j in 1:2){ # voting age levels
+#     for(k in 1:2){ # hisp levels
+#       for(el in 1:7){ # cenRace levels
+#         marPack[[idx]] <- list(0, 0, el,
+#                                votingAgeRecode[j, 1]:votingAgeRecode[j, 2],
+#                                k, i)
+#         idx <- idx + 1
+#       }
+#     }
+#   }
+# }
 # Add margins at county level
 for(i in 1:7){ # county levels
   for(j in 1:2){ # voting age levels
