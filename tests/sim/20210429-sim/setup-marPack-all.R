@@ -23,7 +23,7 @@ stateRecode[1, ] <- c(1, 28)
 stateRecode[2, ] <- c(29, 43)
 
 # setup marPack
-marPack = vector("list", 1872)
+marPack = list()
 
 idx <- 1
 
