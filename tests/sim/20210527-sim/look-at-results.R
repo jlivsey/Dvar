@@ -41,13 +41,6 @@ tr3Err <- tr3 - Av
 cntErr <- cnt - Av
 allErr <- all - Av
 
-# ---- Boxplot of absolute error ----
-boxplot(cbind(nonErr[, 1:2],
-              allErr[, 1:2],
-              tr1Err[, 1:2],
-              tr2Err[, 1:2],
-              tr3Err[, 1:2],
-              cntErr[, 1:2]))
 
 # ---- Variance ----
 nonVar = apply(non, 1, var)
@@ -59,8 +52,29 @@ allVar = apply(all, 1, var)
 
 boxplot(cbind(nonVar, tr1Var, tr2Var, tr3Var, cntVar, allVar), ylim = c(0, 100))
 
-# ---- What variance is huge? ----
-Av[which(nonVar > 50)]
+# ---- RMSE ----
+# Take mean of all param estimates
+nonMu = apply(non, 1, mean)
+tr1Mu = apply(tr1, 1, mean)
+tr2Mu = apply(tr2, 1, mean)
+tr3Mu = apply(tr3, 1, mean)
+cntMu = apply(cnt, 1, mean)
+allMu = apply(all, 1, mean)
+
+# root mean square error
+nonRMSE = sqrt(apply(non^2, 1, mean) - nonMu^2)
+tr1RMSE = sqrt(apply(tr1^2, 1, mean) - tr1Mu^2)
+tr2RMSE = sqrt(apply(tr2^2, 1, mean) - tr2Mu^2)
+tr3RMSE = sqrt(apply(tr3^2, 1, mean) - tr3Mu^2)
+cntRMSE = sqrt(apply(cnt^2, 1, mean) - cntMu^2)
+allRMSE = sqrt(apply(all^2, 1, mean) - allMu^2)
+
+summary(nonRMSE)
+summary(tr1RMSE)
+summary(tr2RMSE)
+summary(tr3RMSE)
+summary(cntRMSE)
+summary(allRMSE)
 
 
 
