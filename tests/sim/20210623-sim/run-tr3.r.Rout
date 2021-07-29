@@ -1,0 +1,129 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> install.packages("Dvar_0.0.0.9000.tar.gz")
+Installing package into ‘/home/l/livse301/R/x86_64-redhat-linux-gnu-library/3.3’
+(as ‘lib’ is unspecified)
+inferring 'repos = NULL' from 'pkgs'
+* installing *source* package ‘Dvar’ ...
+** R
+** data
+*** moving datasets to lazyload DB
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+  converting help for package ‘Dvar’
+    finding HTML links ... done
+    Sim3Way                                 html  
+    Sim6Way                                 html  
+    arrayEval                               html  
+    arraySetOnes                            html  
+    geoChar2geoMod                          html  
+    geo_of_mar                              html  
+    marginZero2vec                          html  
+    queryChar2queryMod                      html  
+    query_of_mar                            html  
+    recode                                  html  
+** building package indices
+** testing if installed package can be loaded
+* DONE (Dvar)
+> 
+> library(Dvar)
+> library(L1pack)
+Loading required package: fastmatrix
+> 
+> # source different sim6way to normalize epsMod
+> source("sim6way.r")
+> 
+> #' True table
+> load("true-table.Rdata")
+> 
+> # load marPack object
+> load('marPack-tr3.RData')
+> 
+> # privacy budget parameters
+> bpar <- 12
+> geoMod <- c(1/3, 1/3, 1/3)
+> queryMod <- c(1/4, 1/4, 1/4, 1/4)
+> 
+> # Run simulation
+> OUT <-
++   Sim6Way(Nrep    = 50,
++           intab   = A,
++           bpar    = bpar,
++           marPack = marPack,
++           geoMod  = geoMod,
++           queryMod = queryMod)
+[1] "replication 1 starting at: 2021-07-26 09:56:19"
+[1] "replication 2 starting at: 2021-07-26 10:49:32"
+[1] "replication 3 starting at: 2021-07-26 11:40:40"
+[1] "replication 4 starting at: 2021-07-26 12:33:18"
+[1] "replication 5 starting at: 2021-07-26 13:25:11"
+[1] "replication 6 starting at: 2021-07-26 14:15:47"
+[1] "replication 7 starting at: 2021-07-26 15:09:06"
+[1] "replication 8 starting at: 2021-07-26 16:01:36"
+[1] "replication 9 starting at: 2021-07-26 16:52:36"
+[1] "replication 10 starting at: 2021-07-26 17:45:48"
+[1] "replication 11 starting at: 2021-07-26 18:39:27"
+[1] "replication 12 starting at: 2021-07-26 19:30:49"
+[1] "replication 13 starting at: 2021-07-26 20:24:02"
+[1] "replication 14 starting at: 2021-07-26 21:16:15"
+[1] "replication 15 starting at: 2021-07-26 22:09:51"
+[1] "replication 16 starting at: 2021-07-26 23:05:56"
+[1] "replication 17 starting at: 2021-07-26 23:56:15"
+[1] "replication 18 starting at: 2021-07-27 00:46:31"
+[1] "replication 19 starting at: 2021-07-27 01:38:07"
+[1] "replication 20 starting at: 2021-07-27 02:29:42"
+[1] "replication 21 starting at: 2021-07-27 03:19:06"
+[1] "replication 22 starting at: 2021-07-27 04:10:46"
+[1] "replication 23 starting at: 2021-07-27 05:03:07"
+[1] "replication 24 starting at: 2021-07-27 05:55:35"
+[1] "replication 25 starting at: 2021-07-27 06:47:37"
+[1] "replication 26 starting at: 2021-07-27 07:37:18"
+[1] "replication 27 starting at: 2021-07-27 08:27:13"
+[1] "replication 28 starting at: 2021-07-27 09:22:42"
+[1] "replication 29 starting at: 2021-07-27 10:14:16"
+[1] "replication 30 starting at: 2021-07-27 11:07:47"
+[1] "replication 31 starting at: 2021-07-27 11:57:15"
+[1] "replication 32 starting at: 2021-07-27 12:51:16"
+[1] "replication 33 starting at: 2021-07-27 13:41:39"
+[1] "replication 34 starting at: 2021-07-27 14:33:02"
+[1] "replication 35 starting at: 2021-07-27 15:25:28"
+[1] "replication 36 starting at: 2021-07-27 16:19:37"
+[1] "replication 37 starting at: 2021-07-27 17:11:40"
+[1] "replication 38 starting at: 2021-07-27 18:02:55"
+[1] "replication 39 starting at: 2021-07-27 18:53:44"
+[1] "replication 40 starting at: 2021-07-27 19:45:03"
+[1] "replication 41 starting at: 2021-07-27 20:55:58"
+[1] "replication 42 starting at: 2021-07-27 21:46:47"
+[1] "replication 43 starting at: 2021-07-27 22:36:34"
+[1] "replication 44 starting at: 2021-07-27 23:26:19"
+[1] "replication 45 starting at: 2021-07-28 00:17:08"
+[1] "replication 46 starting at: 2021-07-28 01:05:41"
+[1] "replication 47 starting at: 2021-07-28 01:55:37"
+[1] "replication 48 starting at: 2021-07-28 02:46:20"
+[1] "replication 49 starting at: 2021-07-28 03:38:50"
+[1] "replication 50 starting at: 2021-07-28 04:30:09"
+> 
+> # Save output
+> save(OUT, file = "20210623-results-tr3.RData")
+> 
+> proc.time()
+      user     system    elapsed 
+156652.622     68.101 156713.216 
