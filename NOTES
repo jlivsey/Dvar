@@ -1,0 +1,51 @@
+Questions
+---------
+
+Relationship bw tally of variables that changed as they relate to the
+margins that were included.
+  - Also look at this by threshold of change
+
+When an interior cell changes, how often is a corresponding margin that contains
+that cell exactly satisfied?
+
+
+
+
+4 boxplots:
+  1. changed interior cells
+  2. unchanged interior cells
+  3. changed margins
+  4. unchagnges margins
+
+Contribution of absolutle value to L1 regression if Xhat = XDP for margins
+and Xhat = eps for interior cells.
+
+
+
+looking at results for margins of L1 regression.
+We have the following categories to consider:
+1. True maginal sum (not visable to L1 regression)
+2. Sum of interior cells DP value (starting point of sorts)
+3. DP marginal value (sum of 1. and laplace noise)
+4. Estimated marginal value (sum of interior estimates)
+
+
+To Do
+------
+
+1. Consider "starting error" problem for margins that are Changed
+  (absolute error != 0)
+
+2. When is L1-regression solution unique? do our solvers check this?
+
+
+Given sparse cell with large absoulte error, look at values of "neighborhood"
+cells. Conjecture: they might be large and providing some room for
+redistributing in the L1 regression.
+
+Scale neighborhoods slightly to see if we can mitigate this effect?
+
+Scaling of epsMod - can we recover the proper scale factor for 20210601-sim and 20210623-sim. Need to think about epsMod <- epsMod / sum(epsMod) line of sim6way.r code
+
+
+
