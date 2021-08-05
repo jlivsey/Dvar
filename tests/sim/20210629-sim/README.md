@@ -1,4 +1,4 @@
-This simulation aims to have a more coarse marPack nested structure.
+This simulation aims to have a more finer partiton of marPack nested structure.
 
 For the following set of simulations we move outward in a nested structure from the no margins case.
 This follows Table 2 in the write up, starting in the top-right with only detailed-tract.
