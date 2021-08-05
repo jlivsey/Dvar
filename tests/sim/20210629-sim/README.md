@@ -14,5 +14,5 @@ Nested Structure:
 7. (1290 margins) tr5 = add (votingAge x hisp x cenRace) = (., ., 3:4)
 8. (1548 margins) tr6 = add all (votingAge x hisp x cenRace) AND all age x sex
 9. (1800 margins) cnt = add all county 
-10 (1872 margins) all = all margins                              
+10. (1872 margins) all = all margins                              
 
