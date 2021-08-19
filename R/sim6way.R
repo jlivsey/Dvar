@@ -3,7 +3,7 @@
 #'
 #' @param Nrep Number of replication
 #' @param intab True values - array with 6 dimensions (last is geo)
-#' @param bpar Laplace noise parameter. Privacy Budget
+#' @param eps Laplace noise parameter. Privacy Budget
 #' @param marPack list of lists of vectors with margins to put in model.
 #'                Workload of queries
 #' @param geoMod vector of weights for each geography in marPack
@@ -21,7 +21,7 @@
 #' @export
 #'
 
-Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
+Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
 
   # Change l1pack to not print warning of non-unique solution
   options(warn = -1)
@@ -82,7 +82,7 @@ Sim6Way = function(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL) {
 
   # Generate noise for each run as col of matrix
   set.seed(123)
-  noise <- matrix(data = rlaplace(ndat*Nrep, scale = epsMod * bpar * sqrt(2)),
+  noise <- matrix(data = rlaplace(ndat*Nrep, scale = epsMod * (1/eps) * sqrt(2)),
                   nrow = ndat,
                   ncol = Nrep)
 
