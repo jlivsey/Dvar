@@ -1,6 +1,6 @@
 Package: Dvar
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "James",
            family = "Livsey",
@@ -12,4 +12,4 @@ License: What license it uses
 Encoding: UTF-8
 LazyData: true
 Imports: L1pack
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
