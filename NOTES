@@ -33,6 +33,11 @@ We have the following categories to consider:
 To Do
 ------
 
+1A. go through sim6way function and clarify eps vs bpar !!!!
+    as eps goes up bpar should go down.
+
+
+
 1. Consider "starting error" problem for margins that are Changed
   (absolute error != 0)
 
@@ -46,6 +51,17 @@ redistributing in the L1 regression.
 Scale neighborhoods slightly to see if we can mitigate this effect?
 
 Scaling of epsMod - can we recover the proper scale factor for 20210601-sim and 20210623-sim. Need to think about epsMod <- epsMod / sum(epsMod) line of sim6way.r code
+
+
+One feature to consider for future factorial simulation runs:
+- What if we start to include county and state level margins earlier in the
+  nesting structure.
+  * This gets to answer the questions "what is the optimal eps schedule"
+
+
+
+
+
 
 
 
