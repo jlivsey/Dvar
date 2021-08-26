@@ -2,6 +2,7 @@
 
 export(Sim3Way)
 export(Sim6Way)
+export(alpha2prob)
 export(arrayEval)
 export(arraySetOnes)
 export(geoChar2geoMod)
