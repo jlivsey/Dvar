@@ -82,7 +82,8 @@ Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
 
   # Generate noise for each run as col of matrix
   set.seed(123)
-  noise <- matrix(data = rlaplace(ndat*Nrep, scale = epsMod * (1/eps) * sqrt(2)),
+  noise <- matrix(data = rlaplace(n     = ndat*Nrep,
+                                  scale = epsMod * (1/eps) * sqrt(2)),
                   nrow = ndat,
                   ncol = Nrep)
 
@@ -101,8 +102,6 @@ Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
         coefEsts     <- rbind(coefEsts, new_coefEsts)
     }
 
-    # save(coefEsts,
-    #      file = "~/GitHub/Dvar/tests/sim/sim-results-2020-03-23_Mac_totalOnly.RData")
   }
 
   # Take mean of all param estimates (will be output)
@@ -118,5 +117,6 @@ Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
   #   coefEsts = coefEsts,
   #   noise = noise
   # ))
+
   return(coefEsts)
 }
