@@ -73,6 +73,20 @@ tr7Err <- abs(tr7 - Av)
 cntErr <- abs(cnt - Av)
 allErr <- abs(all - Av)
 
+boxplot(cbind(
+  nonErr[, 2],
+  tr1Err[, 2],
+  tr2Err[, 2],
+  tr3Err[, 2],
+  tr4Err[, 2],
+  tr5Err[, 2],
+  tr6Err[, 2],
+  tr7Err[, 2],
+  cntErr[, 2],
+  allErr[, 2]
+), ylim = c(0, 1))
+
+
 # ---- Which cell has largest Absolute error over all replicates -----
 table(apply(nonErr, 2, which.max))
 table(apply(tr1Err, 2, which.max))
@@ -84,6 +98,18 @@ table(apply(tr6Err, 2, which.max))
 table(apply(tr7Err, 2, which.max))
 table(apply(cntErr, 2, which.max))
 table(apply(allErr, 2, which.max))
+
+# ---- True count for cell with largest Absolute error over all replicates -----
+table(Av[apply(nonErr, 2, which.max)])
+table(Av[apply(tr1Err, 2, which.max)])
+table(Av[apply(tr2Err, 2, which.max)])
+table(Av[apply(tr3Err, 2, which.max)])
+table(Av[apply(tr4Err, 2, which.max)])
+table(Av[apply(tr5Err, 2, which.max)])
+table(Av[apply(tr6Err, 2, which.max)])
+table(Av[apply(tr7Err, 2, which.max)])
+table(Av[apply(cntErr, 2, which.max)])
+table(Av[apply(allErr, 2, which.max)])
 
 # ---- root mean square error ----
 nonRMSE = sqrt(apply(non^2, 1, mean) - nonMu^2)
@@ -108,21 +134,8 @@ summary(tr7RMSE)
 summary(cntRMSE)
 summary(allRMSE)
 
-# ---- Boxplot of absolute error for 1 replicate ----
-boxplot(cbind(nonErr[, 1],
-              tr1Err[, 1],
-              tr2Err[, 1],
-              tr3Err[, 1],
-              tr4Err[, 1],
-              tr5Err[, 1],
-              tr6Err[, 1],
-              tr7Err[, 1],
-              tr8Err[, 1],
-              cntErr[, 1],
-              allErr[, 1]))
-
-# ---- Boxplot of mean absolute error ----
-boxplot(cbind(nonRMSE,
+# ---- Boxplot of RMSE ----
+boxplot(cbind(# nonRMSE,
               tr1RMSE,
               tr2RMSE,
               tr3RMSE,
