@@ -83,7 +83,7 @@ Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
   # Generate noise for each run as col of matrix
   set.seed(123)
   noise <- matrix(data = rlaplace(n     = ndat*Nrep,
-                                  scale = epsMod * (1/eps) * sqrt(2)),
+                                  scale = (1/epsMod) * (1/eps) * sqrt(2)),
                   nrow = ndat,
                   ncol = Nrep)
 
