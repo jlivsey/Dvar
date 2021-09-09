@@ -1,0 +1,43 @@
+
+Thoughts on Specifying GQ Tables for Diff Privacy Variance Simulations
+======================================================================
+
+Eric Victor Slud                                              9/7/21
+
+These paragraphs are a slightly aplified version of the emails I sent right at the end of August, last week.
+	
+I have been thinking for the past couple of days about how to modify our simulations to get closer to our objective of seeing measures of cell-level variability stabilize as we progress along the axis of greater and greater workload. I am sorry to suggest a backward movement, but I think that we may (based on an incorrect way of doing and looking at simulations) have wrongly eliminated the idea of holding existing noise-infusions (in lower-workload scenarios) constant as we increase the workload.
+
+In the correct way of working with the GQ table of epsilon partitioned across workload additional small pieces of epsilon added to higher levels of aggregation will result in very large amounts of noise added to the highly aggregated marginals and (I am guessing) will not have too great an effect on the variability of basic interior cells of the contingency table. All along, my conjecture was that those elements of the workload corresponding to aggregation-level several rungs higher than the level we are interested in will have only a small effect on variability in most cells. I do not see how to test that idea without fixing the noise added at lower marginal levels and just adding new noise at highly aggregated levels.
+
+So, for example, if we have several different demographic marginals at tract level in our simulations, I think they are all likely to be important to the variability of interior tract-by-demographic cells. However my guess is that for state-by-demographic marginals, and maybe even for county-by-demographic marginals in larger counties, the extra information obtained after releasing data with added noise at those higher levels will not greatly diminish the variability of individual cells.
+
+Here is my suggestion of how to specify the epsilon fractions for different entries in the GQ table. I think it is pretty important to make the county-level G noise-fraction smaller than the tract-level one, with the one for the state-level quite a bit smaller still. Maybe the initial proportions should be something like Tract = 0.6, County =0.3, State=0.1. (I realize that in our example, "State" consists of only 7 counties, but that is still a high enough level of aggregation to deserve triple the noise scale for counties.)
+
+For the cross-classified demographic cells, I am not sure that we were thinking clearly about how to assign noise fractions. Assume for the sake of argument that we released  demographic marginals will be cross-classified at most two-at-a-time, but that we will (in the most comprehensive data-releases) release those two-at-a-time demographic marginals also at each higher geographic-level. That means that the 3-way age-by-RaceHisp-by-Tract and then age-by-RaceHisp-by-County and then age-by-RaceHisp-by-State marginals will successively be released in the more and more detailed workload scenarios.
+
+When we specify the fractions of epsilon for demographic (one or two-at-a-time) releases, the rule should be that the more-cross-classified releases should always get larger epsilon-fractions, because they are closer to the level of fully-cross-classified interior cells. So maybe we should assign epsilon-fraction 0.5 to the fully-cross-classified (5 or 6-way) interior demographic cells [I see that we do have a separate row for that in our Q-tabulation, did we ?], with fraction 0.2  for the two 2-way-cross-classified age-by-raceHisp  and age-by-sex and 0.1 for Owner. Because of our correction to use reciprocals of epsilon-pieces for Laplace scale parameters, it is now important to make the most detailed queries get the highest Q fractions.
+
+This use of unequal epsilon-fractions for different releases might require a bit of extra coding, but the flexibility is worth it.
+
+Once again, to re-cap: when we move from one workload to the next more detailed one, I  suggest that we leave the Laplace noise added to the lesser workload unchanged, and just add workload with new released marginals and added Laplace noise. This does mean that the successive workload scenarios will have progressively larger total epsilon-budget, but I think that might be OK once we make sure that the epsilon pieces for the later (more aggregated) marginal releases are small (so that the added noise is large). I would like to see at least one set of simulations with such progressively increasing epsilon budgets.
+
+If we try the plan in the previous paragraph, we might later find that we obtain  better variance results (leveling-off with less workload, close to the final variance results) if we do some gentle re-scaling of total epsilon budget, still allowing some but lesser increase in epsilon budget between progressive greater-workload scenarios.
+
+Alternative Choices for GQ Tables
+=================================
+
+Moving away from equal epsilon fractions assigned to old and new marginal releases forces us to consider the effect of the detailed GQ table specification on variablility. But note: that is not our principal research question. We have assigned primary importance to learning whether the variability of provatised contingency-table cells are affected in more than a negligible way by releases at mouch more aggregated geographic levels. If we can begin to confirm quantitatively the phenomenon that releases at much higher levels of aggregation affect only very weakly the variability due to privatisations of lower-level table-cells, then a subsidiary research question may be to qunatify that relationship by variying the relative sizes of epsilon-budget assigned to the two levels of aggreation. But the main payoff will be to have reduced the simulation cost of estimating  the variability of detailed table cells due to privatisation.
+
+De-Coupling Geographies Versus simply Reducing Workload
+=======================================================
+
+In what way would we reduce the cost of simulation used in estimating the variability of differentially privatised tables cells ?
+
+In the first instance, computation would be reduced because the workloads needed in the L1 regression computations within each simulation iteration would be smaller. The problem solved in reaching each of these solutions is a linear program, and the smaller workload results in fewer , which are constraint equations. But this is an effect that promises a relatively modest (perhaps 10-20 percent at best) improvement in speed.
+
+Contrast this effect with the computational savings that might be achieved if we replaced the demographic marginal workloads at some specific aggregated level (like state or large county) with the procedure of decoupling the problems of estimating the table entries 
+and variances at that aggregated level. For example, suppose we solve separate linear-programming problems on each of the geographically decoupled populations (such as state or large county) instead of solving a unified problem at national level. These decoupled problems, joined together, would not be exactly equivalent to the unified prioblem, but the estimates at very detailed levels (eg fully cross-classified cells at Census Block level) might be very close, and we might be able to demonstrate empirically that the correspionding variances of those estimated cell counts are also very close.
+
+The computational savings of solving decoupled rather than unified problems may be substantial. The issue is what the growth rate for computational complexity as a function of overall population size. We suppose that growth rate is super-linear, because there is OR literature of about 25 years ago (one relevant name in it is Mike Todd) suggesting that the average growth rate of simplex-method linear programming solutions is roughly linear in the (sum of?) numbers of variables (cells in our cases) and linear workload constraints. (The number of structurally nonempty cells may grow faster than linearly with the population size.)
+
