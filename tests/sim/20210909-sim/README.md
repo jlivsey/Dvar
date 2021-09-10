@@ -2,6 +2,8 @@ This simulation has:
 
 $$ \epsilon = 12 $$
 
+- <img src="https://latex.codecogs.com/gif.latex?\epsilon = 12" />
+
 and $`\epsilon`$ schedule,
 
 |                          | State | County | Tract | [Total] |
