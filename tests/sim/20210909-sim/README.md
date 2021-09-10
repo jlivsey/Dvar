@@ -2,7 +2,7 @@ This simulation has:
 
 $$ \epsilon = 12 $$
 
-and $\epsilon$ schedule,
+and $`\epsilon`$ schedule,
 
 |                          | State | County | Tract | [Total] |
 |--------------------------|-------|--------|-------|---------|
