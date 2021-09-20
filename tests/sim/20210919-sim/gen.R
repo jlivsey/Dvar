@@ -4,9 +4,9 @@ source("util.R")
 # Levels of simulation will be defined here
 sim_levels <- 0:10 # This should match marPack##.RData files
 N_sim <- 1
-eps   <- 12
-geoMod   <- c(1/3, 1/3, 1/3)
-queryMod <- c(1/4, 1/4, 1/4, 1/4)
+eps   <- 1
+geoMod = c(.1, .3, .6)
+queryMod = c(.6, .1, .2, .1)
 # ---- End config -----
 
 for(idx_sim in seq_along(sim_levels)){
@@ -22,8 +22,8 @@ for(idx_sim in seq_along(sim_levels)){
   script = paste(sep = "\n",
                  "library(L1pack)",
                  sprintf("simResultsName = \"%s\"", simResultsName),
-                 sprintf("load(\"../marPack%d.RData\")\n", simNum),
-                 "load(\"../true-table.Rdata\")\n",
+                 sprintf("load(\"marPack%d.RData\")\n", simNum),
+                 "load(\"true-table.Rdata\")\n",
                  sprintf("Nrep = %d", N_sim),
                  sprintf("eps = %g", eps),
                  sprintf("geoMod = %s", print_vector(geoMod)),

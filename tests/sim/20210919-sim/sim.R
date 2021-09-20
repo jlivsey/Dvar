@@ -17,6 +17,8 @@
 
 library(L1pack)
 
+source("util.R")
+
 #' True table
 intab <- A
 
