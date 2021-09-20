@@ -1,5 +1,5 @@
-* Major change for this simulation R: Now objective function
-is weighted by the inverse of the noise scale parameter.
+### Major change for this simulation
+Now objective function is weighted by the inverse of the noise scale parameter.
 
 This simulation has:
 
