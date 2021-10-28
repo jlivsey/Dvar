@@ -103,9 +103,9 @@ for(i in 1:Nrep){
   y <- y_true + noise[, i]
   # Fit model and return estimated coefs
   if(i == 1){
-    coefEsts <- l1fit(W*X, W*y, int=F)$coef
+    coefEsts <- l1fit(W %*% X, W %*% y, int=F)$coef
   }else{
-    new_coefEsts <- l1fit(W*X, W*y, int=F)$coef
+    new_coefEsts <- l1fit(W %*% X, W %*% y, int=F)$coef
     coefEsts     <- rbind(coefEsts, new_coefEsts)
   }
 
