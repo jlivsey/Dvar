@@ -1,0 +1,122 @@
+---
+title: "Testing our conjecture"
+author: "JL and ES"
+date: "10/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(L1pack)
+options(warn = -1)
+```
+
+## Non-full workload 
+
+Here we explore a 3x3 table without the 15th (last) margin
+
+```{r, echo=FALSE}
+bpar = 1
+bpar_mar = 3
+bpar_vec = c(rep(bpar,9), rep(bpar_mar,5)) # remove last margin
+
+workld = rbind(diag(9),
+               rep(c(1,0,0),3),
+               rep(c(0,1,0),3),
+               rep(c(0,0,1),3),
+               c(1,1,1,rep(0,6)),
+               c(0,0,0,1,1,1,0,0,0) ) 
+               # c(rep(0,6),1,1,1))    
+
+x = sample(1:10, 9)
+
+noise = (2 * rbinom(nrow(workld), 1, 1/2)-1)*rexp(nrow(workld))*bpar_vec
+
+xDP = c(workld %*% x + noise)
+
+df <- data.frame(noise = noise,
+                 xDP   = xDP,
+                 true  = workld %*% x)
+print(df)
+
+# Setup two weighting schemes
+bpar2 <- 1.5
+bpar3 <- 2
+bpar_vc2 = c(rep(1,9), rep(bpar2, 5))
+bpar_vc3 = c(rep(1,9), rep(bpar3, 5))
+
+SlackMat = array(T, c(1000,9,3), dimnames=list(NULL,1:9,paste0("bmar=",c(1, bpar2, bpar3))))
+
+d <- nrow(workld)
+for(i in 1:1000) {
+  noisT = (2 * rbinom(d, 1, 1/2)-1)*rexp(d)*bpar_vec
+  yDP = c(workld %*% x + noisT)
+  SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+  SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5)
+  SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vec)*workld, yDP/bpar_vc3, int=F)$coef)>1e-5) }
+
+```
+
+```{r}
+apply(SlackMat,2:3,mean)
+```
+
+__Results are consistent with our conjecture!__
+
+
+## One detailed cell with no margins 
+
+Here we remove the 12th and 15th margins. This has the effect that the 9th
+detail entry is not a part of any margin. 
+
+```{r, echo=FALSE}
+bpar = 1
+bpar_mar = 3
+
+# This workload has 9th detailed cell NOT in any margins
+workld = rbind(diag(9),
+               rep(c(1,0,0),3),
+               rep(c(0,1,0),3),
+               #rep(c(0,0,1),3), 
+               c(1,1,1,rep(0,6)),
+               c(0,0,0,1,1,1,0,0,0) ) 
+# c(rep(0,6),1,1,1))    
+
+d <- nrow(workld)
+bpar_vec = c(rep(bpar,9), rep(bpar_mar, d-9)) # remove last margin
+
+
+# Draw x and noise values
+x <- sample(1:10, 9)
+B <- (2 * rbinom(d, 1, 1/2)-1) # random -1 or 1 coinflip
+noise <-  B * rexp(d) * bpar_vec
+
+xDP = c(workld %*% x + noise)
+
+df <- data.frame(noise = noise,
+                 xDP   = xDP,
+                 true  = workld %*% x + noise)
+print(df)
+
+# Setup two weighting schemes
+bpar2 <- 1.5
+bpar3 <- 2
+bpar_vc2 = c(rep(1,9), rep(bpar2, d-9))
+bpar_vc3 = c(rep(1,9), rep(bpar3, d-9))
+
+SlackMat = array(T, c(1000,9,3), dimnames=list(NULL,1:9,paste0("bmar=",c(1, bpar2, bpar3))))
+
+for(i in 1:1000) {
+  noisT = (2 * rbinom(d, 1, 1/2)-1)*rexp(d)*bpar_vec
+  yDP = c(workld %*% x + noisT)
+  SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+  SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5)
+  SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vec)*workld, yDP/bpar_vc3, int=F)$coef)>1e-5) }
+```
+
+```{r}
+apply(SlackMat,2:3,mean)
+```
+
+__Again, results are consistent with our conjecture!__
+

@@ -1,0 +1,235 @@
+
+#####################################  10/14/21 EVS
+
+### let's look at 3x3 with 2 margins
+
+ bpar = 1
+ bpar_mar = 3
+ bpar_vec = c(rep(bpar,9), rep(bpar_mar,6))
+
+ workld = rbind(diag(9), 
+           rep(c(1,0,0),3),
+           rep(c(0,1,0),3),
+           rep(c(0,0,1),3),
+           c(1,1,1,rep(0,6)),
+           c(0,0,0,1,1,1,0,0,0),
+           c(rep(0,6),1,1,1))     ### 15 workload rows
+
+  x = sample(1:10, 9)
+  
+  noise = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*bpar_vec)
+
+  xDP = c(workld %*% x + noise)
+
+> cbind(noise,xDP,c(x,rep(NA,6)))
+             noise       xDP   
+ [1,] -0.183458483  7.816542  8    ## Last column is "true" cellct
+ [2,]  2.906788103  9.906788  7
+ [3,] -0.753666940  8.246333  9
+ [4,]  0.779262208  6.779262  6
+ [5,] -1.883477261  1.116523  3
+ [6,]  0.941492094  2.941492  2
+ [7,] -0.001566056  3.998434  4
+ [8,]  0.797122502  1.797123  1
+ [9,]  1.215358085  6.215358  5
+[10,] -1.837600809 16.162399 NA
+[11,]  7.582103295 18.582103 NA
+[12,] -0.227973374 15.772027 NA
+[13,]  0.770556904 24.770557 NA
+[14,]  1.864686475 12.864686 NA
+[15,] -6.796979730  3.203020 NA
+
+  NonWgtEst = l1fit(workld, xDP, int=F)
+Warning message:
+In l1fit(workld, xDP, int = F) : Non-unique solution possible
+
+  WgtdEst = l1fit((1/bpar_vec)*workld, xDP/bpar_vec, int=F)
+
+> round(rbind(xDP[1:9],NonWgtEst$coef, WgtdEst$coef),5)
+          X1      X2      X3      X4      X5      X6      X7      X8      X9
+[1,] 7.81654 9.90679 8.24633 6.77926 1.11652 2.94149 3.99843 1.79712 6.21536
+[2,] 6.61744 9.90679 8.24633 6.77926 3.14393 2.94149 2.76570 1.79712 4.58420
+[3,] 7.81654 9.90679 8.24633 6.77926 1.11652 2.94149 3.99843 1.79712 6.21536
+
+## solutions disagree only in entries 1, 5, 7, 9
+
+### So the issue seems to be that there is a non-unique solution for the 
+##    unweighted problem
+
+sum(abs(c(workld  %*% NonWgtEst$coef - xDP)))        ###  15.76867
+sum(abs(c(workld  %*% WgtdEst$coef - xDP)))          ###  21.85907
+
+sum(abs(c(workld  %*% NonWgtEst$coef - xDP)/bpar_vec))        ###   9.31649
+sum(abs(c(workld  %*% WgtdEst$coef - xDP)/bpar_vec))          ###   7.28636
+
+## This says that each of the solutions (wghtd or unwghtd) is definitely 
+##   better for its own objective function.
+
+l1fit((1/(bpar_vec+.01))*workld, xDP/(bpar_vec+.01), int=F)$coef
+      X1       X2       X3       X4       X5       X6       X7       X8       X9 
+7.816542 9.906788 8.246333 6.779262 1.116523 2.941492 3.998434 1.797123 6.215358  ## same as XDP
+u9 = runif(15,.01)
+l1fit((1/(bpar_vec+u9))*workld, xDP/(bpar_vec+u9), int=F)$coef
+      X1       X2       X3       X4       X5       X6       X7       X8       X9 
+6.617436 9.906788 8.246333 6.779262 1.116523 2.941492 3.998434 1.797123 6.215358 
+
+l1fit((1/(1+u9))*workld, xDP/(1+u9), int=F)$coef
+      X1       X2       X3       X4       X5       X6       X7       X8       X9 
+6.617436 9.906788 8.246333 6.779262 3.143932 2.941492 2.765701 1.797123 4.584201 
+
+## Solutions quite sensitive to small changes in weights !!?
+
+bpar_vc2 = c(rep(1,9),rep(2,6))
+l1fit((1/bpar_vc2)*workld, xDP/bpar_vc2, int=F)$coef
+      X1       X2       X3       X4       X5       X6       X7       X8       X9 
+7.816542 9.906788 8.246333 6.779262 1.116523 2.941492 1.566595 1.797123 4.584201 
+Warning message:
+In l1fit((1/bpar_vc2) * workld, xDP/bpar_vc2, int = F) :
+  Non-unique solution possible
+
+## So we are seeing many different solutions based on small or large weight modifications
+##   This is not exactly the pattern we saw in the toy 2-cell 1-margin example.
+
+## Let's look at the original problem with either bpar_mar=1 (ie unweighted or bpar_mar =2 or 3)
+##  and tally the results of 1000 replications as Jim did before. The tally will give the
+##  prob vector of relative freq's with which the entries of xDP and the $coef solution differ.
+
+SlackMat = array(T, c(1000,9,3), dimnames=list(NULL,1:9,paste0("bmar=",1:3)))
+
+for(i in 1:1000) {
+   noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*bpar_vec
+   yDP = c(workld %*% x + noisT)
+   SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+   SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5)
+   SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vec)*workld, yDP/bpar_vec, int=F)$coef)>1e-5) }
+
+> dim(SlackMat)
+[1] 1000    9    3
+> apply(SlackMat,2:3,mean)
+  bmar=1 bmar=2 bmar=3
+1  0.440  0.003      0
+2  0.364  0.021      0
+3  0.342  0.046      0
+4  0.321  0.027      0
+5  0.419  0.134      0
+6  0.385  0.134      0
+7  0.361  0.094      0
+8  0.372  0.185      0
+9  0.399  0.206      0
+
+## Interesting: this makes the outcome not a paradox about linear programming
+##    but a statement about the key importance of the choice of marginal weights !!
+
+## NB in all of these examples, the marginal noise was large. We could do this again
+##   with marginal noise generated with smaller scale:
+
+SlackMat = array(T, c(1000,9,3), dimnames=list(NULL,1:9,paste0("bmar=",1:3)))
+
+for(i in 1:1000) {
+   noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)
+   yDP = c(workld %*% x + noisT)
+   SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+   SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5)
+   SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vec)*workld, yDP/bpar_vec, int=F)$coef)>1e-5) }
+
+> apply(SlackMat,2:3,mean)
+  bmar=1 bmar=2 bmar=3                  ### Pattern is quite similar !!?
+1  0.513  0.000      0
+2  0.396  0.001      0
+3  0.345  0.003      0
+4  0.335  0.006      0
+5  0.488  0.130      0
+6  0.418  0.153      0
+7  0.443  0.035      0
+8  0.447  0.208      0
+9  0.487  0.219      0
+
+### Now do it again with DP data that is much noisier at the margins
+
+for(i in 1:1000) {
+   noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*c(rep(1,9),rep(5,6))
+   yDP = c(workld %*% x + noisT)
+   SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+   SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5)
+   SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vec)*workld, yDP/bpar_vec, int=F)$coef)>1e-5) }
+
+> apply(SlackMat,2:3,mean)
+  bmar=1 bmar=2 bmar=3
+1  0.438  0.007      0
+2  0.374  0.038      0
+3  0.343  0.082      0
+4  0.359  0.081      0
+5  0.394  0.139      0
+6  0.359  0.109      0
+7  0.375  0.102      0
+8  0.350  0.115      0
+9  0.396  0.170      0
+
+bpar_vc1.5 = c(rep(1,9), rep(1.5,6))
+bpar_vc2.5 = c(rep(1,9), rep(2.5,6))
+
+for(i in 1:1000) {
+  noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*c(rep(1,9),rep(5,6))
+  yDP = c(workld %*% x + noisT)
+  SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+  SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc1.5)*workld, yDP/bpar_vc1.5, int=F)$coef)>1e-5)
+  SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vc2.5)*workld, yDP/bpar_vc2.5, int=F)$coef)>1e-5) }
+
+  apply(SlackMat,2:3,mean)
+  bmar=1 bmar=2 bmar=3
+1  0.440  0.417      0
+2  0.346  0.293      0
+3  0.336  0.287      0
+4  0.334  0.270      0
+5  0.392  0.352      0
+6  0.377  0.332      0
+7  0.371  0.342      0
+8  0.329  0.307      0
+9  0.367  0.303      0
+
+for(i in 1:1000) {
+  noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*c(rep(1,9),rep(3,6))
+  yDP = c(workld %*% x + noisT)
+  SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+  SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc1.5)*workld, yDP/bpar_vc1.5, int=F)$coef)>1e-5)
+  SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vc2.5)*workld, yDP/bpar_vc2.5, int=F)$coef)>1e-5) }
+
+  apply(SlackMat,2:3,mean)
+  bmar=1 bmar=2 bmar=3
+1  0.450  0.454      0
+2  0.398  0.336      0
+3  0.319  0.268      0
+4  0.306  0.252      0
+5  0.409  0.363      0
+6  0.398  0.357      0
+7  0.359  0.310      0
+8  0.392  0.355      0
+9  0.392  0.326      0
+
+for(i in 1:1000) {
+  noisT = (2 * rbinom(15, 1, 1/2)-1)*rexp(15)*c(rep(1,9),rep(2,6))
+  yDP = c(workld %*% x + noisT)
+  SlackMat[i,,1] = (abs(yDP[1:9] - l1fit(workld, yDP, int=F)$coef)>1e-5)
+  SlackMat[i,,2] = (abs(yDP[1:9] - l1fit((1/bpar_vc1.5)*workld, yDP/bpar_vc1.5, int=F)$coef)>1e-5)
+  SlackMat[i,,3] = (abs(yDP[1:9] - l1fit((1/bpar_vc2)*workld, yDP/bpar_vc2, int=F)$coef)>1e-5) }
+
+  bmar=1 bmar=2 bmar=3
+1  0.452  0.459  0.000
+2  0.375  0.311  0.003
+3  0.325  0.276  0.013
+4  0.347  0.293  0.011
+5  0.427  0.386  0.143
+6  0.410  0.379  0.152
+7  0.411  0.357  0.061
+8  0.413  0.381  0.180
+9  0.399  0.300  0.187
+
+### The overall conclusion has to do with the effect of magnitudes of marginal weights.
+### My conjecture is that when the weights are all equal in the interior cells and are
+###    as large as the number on interior cells in each margin, then the marginal noise 
+###    ceases to play a role in the L1fit solutions.
+
+## The situation in decennial census data may be that there are a few marginal factors
+##    with many levels and not too large weights and these may play a real role in 
+##    the modification of MLE cell-inferences.
+
