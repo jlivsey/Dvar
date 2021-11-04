@@ -1,6 +1,6 @@
 library(tidyverse, warn.conflicts = FALSE, quietly = TRUE)
 
-simDir <- "~/Github/Dvar/tests/sim/20210919-sim"
+simDir <- "~/Github/Dvar/tests/sim/20211028-sim"
 nsim <- 1
 
 # ---- Load Results ----
@@ -30,7 +30,7 @@ Av <- c(A)
 absErr <- abs(R - Av)
 par(mfrow = c(1, 2), mar = c(3, 3, 3, .1))
 boxplot(absErr, main = "absolute error")
-boxplot(absErr, ylim = c(0, 1), main = "zoom in to (0, 1)")
+boxplot(absErr, ylim = c(0, 9), main = "zoom in to (0, 1)")
 
 # ---- summary ----
 View(apply(R, 2, summary))
