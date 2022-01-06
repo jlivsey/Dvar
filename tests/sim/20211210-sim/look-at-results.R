@@ -1,6 +1,7 @@
 library(tidyverse, warn.conflicts = FALSE, quietly = TRUE)
+dim0 <- c(2, 2, 7, 3, 2, 43)
 
-simDir <- "~/Github/Dvar/tests/sim/20211028-sim"
+simDir <- "~/Github/Dvar/tests/sim/20211210-sim"
 nsim <- 1
 
 # ---- Load Results ----
@@ -34,6 +35,42 @@ boxplot(absErr, ylim = c(0, 9), main = "zoom in to (0, 1)")
 
 # ---- summary ----
 View(apply(R, 2, summary))
+
+
+# ---- Absolute Error of margins in workload ----
+
+M <- matrix(NA, length(marPack), 7224)
+for(i in 1:length(marPack)) {
+  # extract i-th element from marPack and formulate as full vectors not 0.
+  mar <- marginZero2vec(marPack[[i]], mydim = dim0)
+  # Find next row for design matrix
+  Zv <- c(arraySetOnes(dim0, mar))
+  M[i, ] <- Zv
+}
+# M is the margin extraction matrix. M %*% datavector will return margin
+
+marTru <- M %*% Av
+marEst <- M %*% R2
+
+marAbsErr <- abs(c(marTru) - marEst)
+boxplot(marAbsErr)
+
+
+# ---- Comparison to laplace variance ----
+geoMod   <- .3
+queryMod <- .3
+b        <- sqrt(2) / 5 / geoMod / queryMod
+
+2 * b^2
+apply(c(marTru) - marEst, 2, var)
+
+
+
+
+
+
+
+
 
 
 
