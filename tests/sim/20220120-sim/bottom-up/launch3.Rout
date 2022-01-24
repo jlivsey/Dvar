@@ -1,0 +1,57 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> load("marPacks-BU.RData")
+> simResultsName = "results3.RData"
+> marPack = marPack3
+> load("true-table.Rdata")
+> 
+> Nrep = 20
+> eps = 5
+> geoMod = c(0.4,0.3,0.3)
+> queryMod = c(0.2,0.25,0.25,0.3)
+> 
+> source("sim.R")
+Loading required package: fastmatrix
+[1] "replication 1 starting at: 2022-01-22 10:20:36"
+[1] "replication 2 starting at: 2022-01-22 11:21:33"
+[1] "replication 3 starting at: 2022-01-22 12:25:11"
+[1] "replication 4 starting at: 2022-01-22 13:28:27"
+[1] "replication 5 starting at: 2022-01-22 14:33:58"
+[1] "replication 6 starting at: 2022-01-22 15:36:55"
+[1] "replication 7 starting at: 2022-01-22 16:40:23"
+[1] "replication 8 starting at: 2022-01-22 17:41:23"
+[1] "replication 9 starting at: 2022-01-22 18:41:09"
+[1] "replication 10 starting at: 2022-01-22 19:39:24"
+[1] "replication 11 starting at: 2022-01-22 20:38:35"
+[1] "replication 12 starting at: 2022-01-22 21:39:41"
+[1] "replication 13 starting at: 2022-01-22 22:39:09"
+[1] "replication 14 starting at: 2022-01-22 23:41:40"
+[1] "replication 15 starting at: 2022-01-23 00:41:50"
+[1] "replication 16 starting at: 2022-01-23 01:41:50"
+[1] "replication 17 starting at: 2022-01-23 02:42:30"
+[1] "replication 18 starting at: 2022-01-23 03:43:52"
+[1] "replication 19 starting at: 2022-01-23 04:48:10"
+[1] "replication 20 starting at: 2022-01-23 05:50:38"
+> 
+> proc.time()
+     user    system   elapsed 
+73787.871    28.697 73897.605 
