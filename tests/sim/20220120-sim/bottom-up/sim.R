@@ -83,7 +83,6 @@ for(i in 1:length(marPack)){
 # coefEsts = matrix(0, Nrep, d)
 
 # Generate noise for each run as col of matrix
-noiseSeed <- sample(1:99999, 1)
 set.seed(noiseSeed)
 # vector of laplace scale param for each row of L1regression
 bpar <- (1/epsMod) * (1/eps) * sqrt(2)

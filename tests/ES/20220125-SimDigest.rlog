@@ -1,0 +1,89 @@
+
+R Log to Extract and Analyze Table-Cell Summaries from Jim's Simulations
+========================================================================
+Eric Slud,        1/25/2022
+
+> setwd("c://EricStf/CensusProj/DiffPrivacy")
+> attach("bottomUp-forEric.RData")
+> objects(2)
+[1] "A" "R"
+> dimnames(A)   ### 2x2x7x3x2x43  =  7224 elements
+[[1]]
+[1] "own" "rnt"
+
+[[2]]
+[1] "mal" "fem"
+
+[[3]]
+[1] "wh"   "bl"   "as"   "aian" "pac"  "oth"  "twp" 
+
+[[4]]
+[1] "0-17"  "18-62" "62p"  
+
+[[5]]
+[1] "hisp"    "nonhisp"
+
+[[6]]
+ [1] "tr1"  "tr2"  "tr3"  "tr4"  "tr5"  "tr6"  "tr7"  "tr8"  "tr9"  "tr10"
+[11] "tr11" "tr12" "tr13" "tr14" "tr15" "tr16" "tr17" "tr18" "tr19" "tr20"
+[21] "tr21" "tr22" "tr23" "tr24" "tr25" "tr26" "tr27" "tr28" "tr29" "tr30"
+[31] "tr31" "tr32" "tr33" "tr34" "tr35" "tr36" "tr37" "tr38" "tr39" "tr40"
+[41] "tr41" "tr42" "tr43"
+
+> dim(R)
+[1] 7224   12   20       ## all cells, 12 successive workload sims, 20 runs each
+
+## All 12 runs should have the same Laplace noise added
+#  sum(c(A)) = 14480, avg. pop count of 20 per cell, with lots of zeroes.
+#   so assume  A  is the array of "true " cell counts
+#    and   R  the arrays of sim-by-run cell estimates
+
+
+> summary(c(A))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0       0       0      20       5     467 
+> summary(c(R[,1,]))
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-419.301   -0.872    2.049   20.000    8.173  857.745 
+
+## This is completely weird: it says that the sim1 estimates include 
+#    some huge negative value(s).
+
+> c(sum(c(R[,1,] < -100), sum(c(R[,1,] > 100))
+
+>  c(sum(c(R[,1,] < -100)), sum(c(A > 450)), sum(c(R[,1,] > 450)))
+[1]  6  4 66
+
+> hist(c(log(1+A)))$counts   ## intervals [k/2, (k+1)/2]
+ [1] 3630  834  684  442  349  272  122  130  238  142  260  103   18
+
+> summary(c(R[,1,]-c(A)))
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+-536.3009   -2.3085   -0.0041    0.0000    2.2951  857.7455 
+
+### How can there be cells so negative in R[,1,] ???
+
+> apply(R < -50,2,sum)
+ sim1  sim2  sim3  sim4  sim5  sim6  sim7  sim8  sim9 sim10 sim11 sim12 
+    7    13     1     0     0     1     0     0     0     0     0     0 
+> apply(R < -100,2,sum)
+ sim1  sim2  sim3  sim4  sim5  sim6  sim7  sim8  sim9 sim10 sim11 sim12 
+    6     0     0     0     0     0     0     0     0     0     0     0 
+
+## 6 cells have value < -100  in Sim1, which is presumably just the sim with
+##    iid Laplace noise added. Each 0 cell would have probability 0.5*exp(-100/b)
+##    of being < -100. If 6 were the expected number we would have 
+#      6 = 3630*20*0.5*exp(-100*epsilon), or epsilon= log(3630*20*0.5/6)/100 = .087
+## Why are we taking epsilon so small ?
+
+detach(); attach("topDown-forEric.RData")
+## A same as before
+
+> summary(c(R[,1,]))
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+-489.3590   -0.9254    2.0116   20.0002    8.1286  955.5997 
+
+## Very similar. So we have a really small epsilon, b >~ 11 and 
+# P(X < -100) = 0.5*exp(-9) = 6.17e-5 
+# and in 3630*20 trials this would happen ~ Poisson(4.5) times ...
+
