@@ -1,0 +1,60 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> source("util.R")
+> 
+> # ---- Begin config -----
+> # Levels of simulation will be defined here
+> sim_levels <- 1:12 # This should match marPack##.RData files
+> N_sim <- 20
+> eps   <- 10
+> geoMod = c(.4, .3, .3)
+> queryMod = c(.2, .25, .25, .3)
+> # ---- End config -----
+> 
+> for(idx_sim in seq_along(sim_levels)){
++ 
++   simNum <- sim_levels[idx_sim]
++ 
++   # Create a name for this level of the simulation
++   simResultsName = sprintf("results%d.RData", simNum)
++ 
++   # Generate launch script and save
++   #Sim6Way = function(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL) {
++   ff = sprintf("launch%d.R", simNum)
++   script = paste(sep = "\n",
++                  #"library(L1pack)",
++                  "load(\"marPacks-BU.RData\")",
++                  sprintf("idx_sim = %d", idx_sim),
++                  sprintf("simResultsName = \"%s\"", simResultsName),
++                  sprintf("marPack = marPack%d", simNum),
++                  "load(\"true-table.Rdata\")\n",
++                  sprintf("Nrep = %d", N_sim),
++                  sprintf("eps = %g", eps),
++                  sprintf("geoMod = %s", print_vector(geoMod)),
++                  sprintf("queryMod = %s", print_vector(queryMod)),
++                  "",
++                  "source(\"sim.R\")\n"
++   )
++   cat(script, file = ff)
++ }
+> 
+> proc.time()
+   user  system elapsed 
+  0.153   0.076   0.279 
