@@ -1,7 +1,7 @@
 library(tidyverse, warn.conflicts = FALSE, quietly = TRUE)
 dim0 <- c(2, 2, 7, 3, 2, 43)
 
-simDir <- "~/Github/Dvar/tests/sim/20220301-sim/top-down//"
+simDir <- "~/Github/Dvar/tests/sim/20220314-sim/top-down//"
 nsim <- 20
 
 # ---- Load Results ----
