@@ -11,7 +11,7 @@ library(tidyverse)
 load("true-table.Rdata")
 
 # load marPack object
-load('marPack-all.RData')
+load('marPacks-BU.RData')
 
 # privacy budget parameters
 # (make sure consistent with coefEst results)
@@ -35,56 +35,91 @@ resultsFiles <-
     "results12.RData"
   )
 
-margin_nonSlack_prop <- matrix(nrow = 11, ncol = 20)
-colnames(margin_nonSlack_prop) <- paste0("rep", 1:20)
-rownames(margin_nonSlack_prop) <- paste0("WL", 2:12)
+n_res <- length(resultsFiles)
+n_reps <- 20
 
-nMar_vec <- numeric(11)
+margin_zero_nonSlack_prop <- array(NA, dim = c(n_reps, n_res, 2))
+dimnames(margin_zero_nonSlack_prop)[[1]] <- paste0("rep", 1:n_reps)
+dimnames(margin_zero_nonSlack_prop)[[2]] <- paste0("WL", 2:12)
+dimnames(margin_zero_nonSlack_prop)[[3]] <- c("old", "new")
+
+nMar_vec <- numeric(n_res)
 
 for(r in seq_along(resultsFiles)){
 
-# load coef estimates
-load(resultsFiles[r])
+  # Store the old X before loading the next results file
+  if(r > 1){
+    Xmar_old <- Xmar
+    nMar_old <- nMar
+    idx_zero_nonSlack_old <- idx_zero_nonSlack
+    idx_nonZero_slack_old <- idx_nonZero_slack
+  }
+
+  # load coef estimates
+  load(resultsFiles[r])
+
+  for(idx_rep in 1:n_reps){
+
+    print(paste("r = ", r, ", idx_rep = ", idx_rep))
+
+    coefEsts2 = coefEsts[idx_rep, ]
+    infNoise = noise[, idx_rep]
+    y <- y_true + infNoise
+
+    # Construct marinal totals using true counts
+    nMar = length(marPack)
+    nMar_vec[r] <- nMar
+    Xmar = X[(nrow(X)-nMar+1):nrow(X), ] #  select last nMar rows of X
+
+    # Calculate which rows of Xmar are new
+    if(r > 1){
+      idx_isOld <- duplicated_rows(Xmar_old, Xmar)
+    }
+
+    # S = data.frame(marNoise = infNoise[(nrow(X) - nMar + 1):nrow(X)])
+    # M <- S %>%
+    #   mutate(truMar = Xmar %*% c(A)) %>%
+    #   mutate(sumInteriorDP = Xmar %*% y[1:7224]) %>%
+    #   mutate(estMar = Xmar %*% coefEsts2) %>%
+    #   mutate(marDP = truMar + marNoise) %>%
+    #   mutate(startingErr = abs(sumInteriorDP - marDP)) %>%
+    #   mutate(slackVal = round(estMar - marDP, 10))
+
+    e = y - X %*% coefEsts2
+    e2 = round(e, 6)
+    # sum(e2 == 0)
+    # sum(e2 != 0)
+    idx_zero_nonSlack <- which(e2 == 0)
+    # idx_nonZero_slack <- which(e2 != 0)
+
+    e2mar <- e2[(7224+1):(7224+nMar)]
+    e2mar_old <- e2mar[idx_isOld]
+    e2mar_new <- e2mar[!idx_isOld]
+
+    idx_zero_old <- e2mar_old == 0
+    idx_zero_new <- e2mar_new == 0
+
+    # How many changes (slack) were in detailed cells vs margins
+    # sum(idx_nonZero_slack <= 7224)
+    # sum(idx_nonZero_slack > 7224)
+
+    # Proportion of marginal constraints non-slack (exactly satisfied)
+    # sum(idx_nonZero_slack > 7224) / nMar
+    # sum(idx_zero_nonSlack > 7224) / nMar
+
+    if(r == 1){
+      margin_zero_nonSlack_prop[idx_rep, r, "new"] <- mean(idx_zero_nonSlack)
+    } else {
+      margin_zero_nonSlack_prop[idx_rep, r, "old"] <- mean(idx_zero_old)
+      margin_zero_nonSlack_prop[idx_rep, r, "new"] <- mean(idx_zero_new)
+    }
 
 
-# for(idx_rep in 1:20){
 
-  print(paste("r = ", r, ", idx_rep = ", idx_rep))
-
-coefEsts2 = coefEsts[idx_rep, ]
-infNoise = noise[, idx_rep]
-y <- y_true + infNoise
-
-# Construct marinal totals using true counts
-nMar = length(marPack)
-nMar_vec[r] <- nMar
-Xmar = X[(nrow(X)-nMar+1):nrow(X), ] #  select last nMar rows of X
-
-S = data.frame(marNoise = infNoise[(nrow(X) - nMar + 1):nrow(X)])
-M <- S %>%
-  mutate(truMar = Xmar %*% c(A)) %>%
-  mutate(sumInteriorDP = Xmar %*% y[1:7224]) %>%
-  mutate(estMar = Xmar %*% coefEsts2) %>%
-  mutate(marDP = truMar + marNoise) %>%
-  mutate(startingErr = abs(sumInteriorDP - marDP)) %>%
-  mutate(slackVal = round(estMar - marDP, 10))
-
-e = y - X %*% coefEsts2
-e2 = round(e, 10)
-sum(e2 == 0)
-sum(e2 != 0)
-idx_nonZero <- which(e2 != 0)
-
-# How many changes were in detailed cells vs margins
-sum(idx_nonZero <= 7224)
-sum(idx_nonZero > 7224)
-
-# Proportion of marginal constraints non-slack (exactly satisfied)
-
-margin_nonSlack_prop[r, idx_rep] <- sum(idx_nonZero > 7224) / nMar
-
-# }
+  }
 }
+
+# save(margin_zero_nonSlack_prop, file = "margin_zero_nonSlack_prop.RData" )
 
 
 margin_nonSlack <- rowSums(margin_nonSlack_prop) / 20
