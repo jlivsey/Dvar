@@ -1,0 +1,332 @@
+
+R Log to fill Table Shells using small practice runs of 20 reps for each of 12 workloads
+========================================================================================
+4/19/2022
+
+> setwd("c://EricStf/CensusProj/DiffPrivacy")
+> attach("bottomUp-forEric-4-13.RData")
+> objects(2)
+[1] "A" "R"  ## A is 2x2x7x3x2x43  =  7224 elements, R is 7224x12x20
+             ## array dimensions: Own, Sex, Race, Age, Hisp, Tract
+
+## noise added should be same in each interior cell and margin when new workload is added
+
+## Confirm indexing of marginals with James on morning of 4/19.
+
+## Need to create new tables B for County  and Carr for State to index later workloads.
+
+## tracts break down into 7 counties successively in blocks c(8,9,11,6,2,3,4)
+
+> csum = cumsum(0,c(8,9,11,6,2,3,4))
+
+> B = array(0, c(2,2,7,3,2,7), dimnames=c(dimnames(A)[1:5],list(paste0("C",1:7))))
+  dimnames(B)
+[[1]]
+[1] "own" "rnt"
+
+[[2]]
+[1] "mal" "fem"
+
+[[3]]
+[1] "wh"   "bl"   "as"   "aian" "pac"  "oth"  "twp"
+
+[[4]]
+[1] "0-17"  "18-62" "62p"
+
+[[5]]
+[1] "hisp"    "nonhisp"
+
+[[6]]
+[1] "C1" "C2" "C3" "C4" "C5" "C6" "C7"           ## OK
+
+> for(i in 1:7) B[,,,,,i] = apply(A,c(1:5), function(vec)
+        sum(vec[(csum[i]+1):csum[i+1]]) )
+
+## Now can do a similar thing for "State" rollup
+## For example, assuming the first 3 counties are ST1,, and the next 4 ST2:
+
+> Carr = array(0, c(2,2,7,3,2,2), dimnames=c(dimnames(A)[1:5],list(c("ST1","ST2"))))
+> dimnames(Carr)
+[[1]]
+[1] "own" "rnt"
+
+[[2]]
+[1] "mal" "fem"
+
+[[3]]
+[1] "wh"   "bl"   "as"   "aian" "pac"  "oth"  "twp"
+
+[[4]]
+[1] "0-17"  "18-62" "62p"
+
+[[5]]
+[1] "hisp"    "nonhisp"
+
+[[6]]
+[1] "ST1" "ST2"
+
+> ssum = c(0,3,7)
+  for(i in 1:2) Carr[,,,,,i] = apply(B,c(1:5), function(vec)
+        sum(vec[(ssum[i]+1):ssum[i+1]]) )
+
+## NB in bottom-up workloads 3, 6, 9, table is based on VotingAge
+##    which is a tabulation of just 2 out of the 3 age-categories.
+##    So we make 3 other tables with suffix V collapsing 2 age-levels.
+
+> AV = A[,,,1:2,,]
+  BV = B[,,,1:2,,]
+  CV = Carr[,,,1:2,,]
+  dimnames(AV)[[4]][2] = dimnames(BV)[[4]][2] = dimnames(CV)[[4]][2] = "18p"
+  AV[,,,2,,] = A[,,,2,,] + A[,,,3,,]
+  BV[,,,2,,] = B[,,,2,,] + B[,,,3,,]
+  CV[,,,2,,] = Carr[,,,2,,] + Carr[,,,3,,]
+
+#===========================================================
+# Next get ready to tally  Sim Results according to size classes of cells
+# Since  A  is the array with "true" cell counts, we create size classes.
+
+## 144480 = pop total, in 7224 cells of average size 20, 3630 empty (about half)
+
+ > c(sum(c(A)==0), sum(c(A)<=5), sum(c(A)<=15), sum(c(A)<=30), sum(c(A)<=100), sum(c(A)> 100))
+[1] 3630 5476 6103 6317 6721  503
+
+> SizGp = cut(c(A), breaks=c(0,1,6,16,51,151,1001,10000, 2e5), right=F)
+> table(SizGp)
+SizGp
+    [0,1)     [1,6)    [6,16)   [16,51)  [51,151) [151,2e+05) [1e+03,1e+04) [1e+04,2e+05)
+     3630      1846       627       340       406        375             0             0
+
+## Now want to indicate how the various marginal cells [used in workloads]
+##   fall within these size classifications
+
+## the marginals for the Sims have the following dimension and array combinations
+
+Sim         Array       Dimensions
+---         -----       ----------
+1            A             1:6
+2            A             1,6
+3            AV            3:6
+4            A             2,4,6
+5            B             1,6
+6            BV            3:6
+7            B             2,4,6
+8            Carr          1,6
+9            CV            3:6
+10           Carr          2,4,6
+11           B             1:6
+12           Carr          1:6
+
+ArrList = c("A","A","AV","A","B","BV","B","Carr","CV","Carr","B","Carr")
+DimList = list(1:6,c(1,6),c(3:6),c(2,4,6),c(1,6),c(3:6),c(2,4,6),
+                   c(1,6),c(3:6),c(2,4,6),1:6,1:6)
+
+## Now we can create a little Table showing the numbers of different levels
+##    of margin-cells in the different size categories
+
+> SizCat.Tbl = array(0, c(12,8), dimnames=list(paste0("Sim",1:12),
+            levels(SizGp)))
+  for(i in 1:12) SizCat.Tbl[i,] = table(
+            cut(apply(get(ArrList[i]),DimList[[i]],sum),
+            breaks=c(0,1,6,16,51,151,1001,10001,2e5), right=F))
+> SizCat.Tbl
+      [0,1) [1,6) [6,16) [16,51) [51,151) [151,1e+03) [1e+03,1e+04) [1e+04,2e+05)
+Sim1   3630  1846    627     340      406         375             0             0
+Sim2      0     0      0       0        0          12            74             0
+Sim3    768   150     70      75       57          49            35             0
+Sim4      0     0      0       0        0         255             3             0
+Sim5      0     0      0       0        0           0             8             6
+Sim6    109    15     13      14       12          20            10             3
+Sim7      0     0      0       0        0           0            42             0
+Sim8      0     0      0       0        0           0             0             4
+Sim9     29     1      5       2        6           6             4             3
+Sim10     0     0      0       0        0           0             6             6
+Sim11   302   327    129     159      106         105            48             0
+Sim12    43    70     64      15       71          37            36             0
+
+## Now consider the coding/functions to fill table shells.
+
+# (T1) mean-squared discrepancy over all interior cells:
+
+ round(apply((R - c(A))^2,2,mean),3)
+ sim2  sim3  sim4  sim5  sim6  sim7  sim8  sim9 sim10 sim11 sim12
+5.421 5.034 4.792 5.115 4.838 4.742 4.785 4.584 4.081 4.203 3.781
+
+## seems convincingly to be trending downward, although not with absolute discrepancy:
+
+>  round(apply(abs(R - c(A)),2,mean),3)
+ sim2  sim3  sim4  sim5  sim6  sim7  sim8  sim9 sim10 sim11 sim12
+1.205 1.218 1.220 1.275 1.274 1.274 1.321 1.313 1.305 1.403 1.349
+
+# (T2) mean-squared discrepancy over interior cells, by size class
+
+T2tab = array(0, c(11,6), dimnames=list(paste0("Sim",2:12), levels(SizGp)[1:6]))
+
+> for(i in 1:6) {
+       inds = which(as.numeric(SizGp)==i)
+       T2tab[,i] = apply((R[inds,,]-c(A)[inds])^2,2,mean) }
+
+> round(T2tab,3)
+      [0,1) [1,6) [6,16) [16,51) [51,151) [151,1e+03)
+Sim2  4.786 5.009  3.307  12.661   12.484       2.919
+Sim3  4.843 4.110  4.786   8.392   10.471       2.919
+Sim4  4.511 4.514  3.218   5.831   10.205       4.718
+Sim5  5.148 4.994  5.052   5.663    4.548       5.625
+Sim6  4.960 4.753  4.112   5.257    4.730       5.024
+Sim7  4.787 4.634  3.966   5.100    5.283       5.220
+Sim8  4.705 4.718  4.337   5.336    5.591       5.262
+Sim9  4.525 4.263  4.772   5.405    5.172       5.041
+Sim10 4.021 3.906  4.484   4.036    4.512       4.425
+Sim11 4.099 4.076  4.412   4.435    4.626       4.815
+Sim12 3.641 3.748  4.088   3.960    4.173       4.208
+
+## Interesting differences between the trend across sims based on size of cell.
+T2abs = replace(T2tab,T,0)
+for(i in 1:6) {
+       inds = which(as.numeric(SizGp)==i)
+       T2abs[,i] = apply(abs(R[inds,,]-c(A)[inds]),2,mean) }
+round(T2abs,3)
+      [0,1) [1,6) [6,16) [16,51) [51,151) [151,1e+03)
+Sim2  1.195 1.203  1.196   1.271    1.256       1.209
+Sim3  1.210 1.210  1.234   1.258    1.285       1.209
+Sim4  1.210 1.215  1.205   1.245    1.326       1.236
+Sim5  1.275 1.266  1.280   1.306    1.251       1.313
+Sim6  1.279 1.270  1.245   1.293    1.263       1.294
+Sim7  1.277 1.269  1.247   1.294    1.281       1.292
+Sim8  1.316 1.310  1.307   1.362    1.368       1.356
+Sim9  1.311 1.286  1.328   1.372    1.342       1.354
+Sim10 1.301 1.287  1.341   1.311    1.324       1.345
+Sim11 1.397 1.375  1.429   1.438    1.441       1.483
+Sim12 1.332 1.336  1.402   1.383    1.401       1.411
+
+T2max = replace(T2tab,T,0)
+for(i in 1:6) {
+       inds = which(as.numeric(SizGp)==i)
+       T2max[,i] = apply(abs(R[inds,,]-c(A)[inds]),2,max) }
+round(T2max,3)
+        [0,1)   [1,6) [6,16) [16,51) [51,151) [151,1e+03)
+Sim2  166.572 218.298 76.335 152.030  165.005      12.837
+Sim3  120.107 119.369 66.004 108.910   94.163      12.837
+Sim4  109.871 119.369 35.911  84.987   82.948      89.224
+Sim5   70.220  55.253 59.150  52.733   51.153      54.442
+Sim6   62.502  46.213 45.839  43.806   54.691      55.926
+Sim7   66.157  49.458 38.268  51.388   55.030      59.506
+Sim8   55.087  41.538 30.501  31.385   34.656      30.593
+Sim9   38.922  39.587 30.423  35.193   38.651      30.958
+Sim10  30.360  27.169 25.397  22.817   26.928      24.993
+Sim11  24.350  16.538 18.881  16.687   15.989      17.731
+Sim12  22.854  18.173 18.261  12.929   12.319      15.199
+
+#  Look at biases:
+
+> round(apply(R - c(A),2,mean),6)
+    sim2     sim3     sim4     sim5     sim6     sim7     sim8     sim9    sim10    sim11    sim12
+ 2.1e-05  8.7e-05  5.2e-05  5.2e-05  5.6e-05  3.1e-05  3.0e-05  2.4e-05 -3.8e-05 -4.4e-05 -3.5e-05
+
+T2bias = replace(T2tab,T,0)
+for(i in 1:6) {
+       inds = which(as.numeric(SizGp)==i)
+       T2bias[,i] = apply(R[inds,,]-c(A)[inds],2,mean) }
+round(T2bias,4)
+       [0,1)   [1,6)  [6,16) [16,51) [51,151) [151,1e+03)
+Sim2  0.0062  0.0069  0.0347 -0.0608  -0.0965      0.0076
+Sim3  0.0197 -0.0014 -0.0052 -0.0483  -0.1269      0.0076
+Sim4  0.0198 -0.0019  0.0235 -0.0363  -0.1549     -0.0204
+Sim5  0.0152 -0.0181 -0.0084 -0.0391  -0.0253      0.0197
+Sim6  0.0168 -0.0211 -0.0033 -0.0248  -0.0315      0.0040
+Sim7  0.0127 -0.0217  0.0130 -0.0086  -0.0342      0.0076
+Sim8  0.0225 -0.0296  0.0013 -0.0437  -0.0406      0.0094
+Sim9  0.0196 -0.0164 -0.0256 -0.0472  -0.0293      0.0088
+Sim10 0.0101 -0.0198  0.0029  0.0159  -0.0237      0.0052
+Sim11 0.0075 -0.0197  0.0185 -0.0112   0.0022      0.0004
+Sim12 0.0113 -0.0253  0.0133  0.0019  -0.0071     -0.0017
+
+## This Table says to me that bias is completely not an issue when
+#  the released data is continuous (and not sign-restricted), so (virtually)
+#  all biases are due to postptocessing.
+
+> apply(R, 2, function(col) sum(col < 0)) /20
+   sim2    sim3    sim4    sim5    sim6    sim7    sim8    sim9   sim10   sim11   sim12
+2053.05 2052.00 2051.35 2046.15 2045.50 2045.70 2043.30 2041.35 2051.30 2059.70 2054.45
+
+> round( apply(R, 2, function(col) -mean(col[col < 0])), 3)
+ sim2  sim3  sim4  sim5  sim6  sim7  sim8  sim9 sim10 sim11 sim12
+1.203 1.213 1.208 1.307 1.309 1.306 1.349 1.338 1.325 1.423 1.349
+
+#================================================================
+# (T3) finish off by looking at some margins.
+# For example let's look at the Sim3 (Race x VA x Hisp x Tract) margins through
+#   all Sim3 - Sim12, overall and by size-class
+
+# loop over Sim3-Sim12 using index 3:12 in ArrList and DimList:
+
+>  summary(c(apply(AV, 3:6, sum)))
+    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+   0.00    0.00    3.00  120.00   29.25 3437.00   ## 1204 cells, avg size 120
+
+auxGp = cut(apply(AV, 3:6, sum), breaks=c(0,1,6,16,51,151,1001,10000), right=F)
+table(auxGp)
+     [0,1)     [1,6)     [6,16)    [16,51)    [51,151)   [151,1e+03)  [1e+03,1e+04)
+       384       304        141        133          87           111            44
+
+## Overall mean-square discrepancy:
+  Rtmp = array(R, c(2,2,7,3,2,43,11,20))
+  Rtmp = apply(Rtmp, 3:8, sum)
+  Rtmp[,2,,,,] = Rtmp[,2,,,,]+Rtmp[,3,,,,]
+  Rtmp = array( Rtmp[,1:2,,,2:11,], c(1204,10,20) )
+  round(apply( (Rtmp-c(apply(AV, 3:6, sum)))^2, 2, mean ), 3)
+ [1] 30.204 28.911 29.459 27.629 27.332 24.937 24.210 20.049  1.867  1.757
+
+# dramatic change quite close to the end, in Sim11: why ?? look by size class
+
+> T3tab = array(0,c(10,7), dimnames=list(paste0("Sim",3:12), levels(auxGp)))
+  for(i in 1:7) {
+       inds = which(as.numeric(auxGp)==i)
+       T3tab[,i] = apply((Rtmp[inds,,]-apply(AV, 3:6, sum)[inds])^2,2,mean) }
+> round(T3tab,3)
+       [0,1)  [1,6) [6,16) [16,51) [51,151) [151,1e+03) [1e+03,1e+04)
+Sim3  16.059 43.084 24.507  26.668   32.428      53.443        30.572
+Sim4  21.575 36.064 27.864  21.438   25.016      40.437        48.080
+Sim5  25.004 32.636 31.073  31.413   30.898      26.921        38.861
+Sim6  25.133 27.493 31.785  30.621   27.499      25.891        32.623
+Sim7  25.314 27.189 29.792  28.014   26.062      27.852        37.182
+Sim8  23.181 24.907 24.390  25.738   25.023      27.111        34.147
+Sim9  22.595 23.378 24.135  24.877   25.137      27.208        32.890
+Sim10 18.920 19.580 19.353  22.574   20.437      20.180        26.653
+Sim11  1.846  1.855  1.798   1.911    1.935       1.911         1.980
+Sim12  1.784  1.753  1.760   1.753    1.723       1.647         1.904
+    ## across all size classes: a big change in these margins in Sim 11 !!
+    ## why should county marginals make such a big difference in these tract-level marginals??
+
+> T3abs = array(0,c(10,7), dimnames=list(paste0("Sim",3:12), levels(auxGp)))
+  for(i in 1:7) {
+       inds = which(as.numeric(auxGp)==i)
+       T3abs[,i] = apply(abs(Rtmp[inds,,]-apply(AV, 3:6, sum)[inds]),2,mean) }
+  round(T3abs,3)
+      [0,1) [1,6) [6,16) [16,51) [51,151) [151,1e+03) [1e+03,1e+04)
+Sim3  3.082 3.556  3.208   3.500    3.437       3.559         3.557
+Sim4  3.164 3.482  3.276   3.399    3.314       3.540         3.893
+Sim5  3.429 3.711  3.626   3.735    3.627       3.497         4.037
+Sim6  3.454 3.628  3.635   3.752    3.522       3.486         3.832
+Sim7  3.465 3.633  3.559   3.661    3.535       3.529         3.942
+Sim8  3.477 3.623  3.523   3.680    3.631       3.712         4.072
+Sim9  3.460 3.536  3.506   3.620    3.600       3.715         4.036
+Sim10 3.294 3.365  3.284   3.530    3.432       3.360         3.817
+Sim11 0.982 0.978  0.969   0.994    0.994       1.003         1.011
+Sim12 0.961 0.958  0.975   0.959    0.964       0.939         0.984
+
+> T3max = array(0,c(10,7), dimnames=list(paste0("Sim",3:12), levels(auxGp)))
+  for(i in 1:7) {
+       inds = which(as.numeric(auxGp)==i)
+       T3max[,i] = apply(abs(Rtmp[inds,,]-apply(AV, 3:6, sum)[inds]),2,max) }
+  round(T3max,3)
+          [0,1)   [1,6)  [6,16) [16,51) [51,151) [151,1e+03) [1e+03,1e+04)
+Sim3   24.806 123.630 118.500  63.570   77.686     113.949        96.061
+Sim4  115.521 115.940 118.500  44.371   79.840      78.893        84.021
+Sim5   44.719  76.395  48.859  58.562   48.317      46.424        54.329
+Sim6   49.481  47.587  60.871  46.828   46.331      51.978        54.247
+Sim7   46.187  50.244  65.666  41.018   45.543      51.461        56.296
+Sim8   35.754  44.754  43.432  32.179   32.238      31.943        31.250
+Sim9   41.198  36.076  35.262  28.772   31.442      32.776        31.039
+Sim10  24.097  22.308  22.278  30.166   26.360      27.077        24.962
+Sim11   6.917   9.968   6.300   7.357    7.402       6.777         7.030
+Sim12   9.649   8.522   6.379   7.877    5.672       7.054         6.243
