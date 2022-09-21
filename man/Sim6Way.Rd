@@ -5,14 +5,14 @@
 \title{Replicate Laplace Noise for 6-way table under the exact schema
 (hhgq, sex, Cenrace, age, hisp, geo).}
 \usage{
-Sim6Way(Nrep, intab, bpar, marPack, geoMod, queryMod, W = NULL)
+Sim6Way(Nrep, intab, eps, marPack, geoMod, queryMod, W = NULL)
 }
 \arguments{
 \item{Nrep}{Number of replication}
 
 \item{intab}{True values - array with 6 dimensions (last is geo)}
 
-\item{bpar}{Laplace noise parameter. Privacy Budget}
+\item{eps}{Laplace noise parameter. Privacy Budget}
 
 \item{marPack}{list of lists of vectors with margins to put in model.
 Workload of queries}
