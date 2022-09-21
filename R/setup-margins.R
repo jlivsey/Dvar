@@ -51,6 +51,10 @@ setup_margins <- function(trct_dtld = FALSE,
   # setup marPack
   marPack = list()
 
+  # Storage for workload indexing
+  WLlist <- list()
+  WLlist[["trct_dtld"]] <- 1:7224
+
   idx <- 1
 
   # ---- Detailed --------------------------------------------------------------------
@@ -63,25 +67,31 @@ setup_margins <- function(trct_dtld = FALSE,
   }
 
   if(cnty_dtld){
+  startIdx <- idx
     # Add detailed margins at county level
       for(j in 1:7){  # county
         marPack[[idx]] <- list(0, 0, 0, 0, 0, countyRecode[j, 1]:countyRecode[j, 2])
         idx <- idx + 1
       }
+  endIdx <- idx - 1
+  WLlist[["cnty_dtld"]] <- 7224 + startIdx:endIdx
   }
 
   if(stat_dtld){
+  startIdx <- idx
     # Add detailed margins at state level
       for(j in 1:2){ # state
         marPack[[idx]] <- list(0, 0, 0, 0, 0, stateRecode[j, 1]:stateRecode[j, 2])
         idx <- idx + 1
       }
+  endIdx <- idx - 1
+  WLlist[["stat_dtld"]] <- 7224 + startIdx:endIdx
   }
 
 
   # ---- HH/GQ --------------------------------------------------------------------
-
     if(trct_hhgq){
+    startIdx <- idx
       # Add HH/GQ margins at tract level
       for(i in 1:2){     # hh/gq
         for(j in 1:43){  # tract
@@ -89,8 +99,12 @@ setup_margins <- function(trct_dtld = FALSE,
           idx <- idx + 1
         }
       }
+  endIdx <- idx - 1
+  WLlist[["trct_hhgq"]] <- 7224 + startIdx:endIdx
     }
+
     if(cnty_hhgq){
+  startIdx <- idx
       # Add HH/GQ margins at county level
       for(i in 1:2){    # hh/gq
         for(j in 1:7){  # county
@@ -98,8 +112,12 @@ setup_margins <- function(trct_dtld = FALSE,
           idx <- idx + 1
         }
       }
+  endIdx <- idx - 1
+  WLlist[["cnty_hhgq"]] <- 7224 + startIdx:endIdx
     }
+
     if(stat_hhgq){
+  startIdx <- idx
       # Add HH/GQ margins at state level
       for(i in 1:2){   # hhgq
         for(j in 1:2){ # state
@@ -107,12 +125,14 @@ setup_margins <- function(trct_dtld = FALSE,
           idx <- idx + 1
         }
       }
+  endIdx <- idx - 1
+  WLlist[["stat_hhgq"]] <- 7224 + startIdx:endIdx
     }
-
 
   # ---- Age x Sex ---------------------------------------------------------------
 
     if(trct_agsx){
+  startIdx <- idx
       # Add margins at tract level
       for(i in 1:43){ # tract levels
         for(j in 1:3){ # age levels
@@ -122,8 +142,12 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
+  endIdx <- idx - 1
+  WLlist[["trct_agsx"]] <- 7224 + startIdx:endIdx
     }
+
     if(cnty_agsx){
+  startIdx <- idx
       # Add margins at county level
       for(i in 1:7){ # county levels
         for(j in 1:3){ # age levels
@@ -134,8 +158,12 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
+  endIdx <- idx - 1
+  WLlist[["cnty_agsx"]] <- 7224 + startIdx:endIdx
     }
+
     if(stat_agsx){
+  startIdx <- idx
       # Add margins at state level
       for(i in 1:2){ # state levels
         for(j in 1:3){ # age levels
@@ -146,6 +174,8 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
+  endIdx <- idx - 1
+  WLlist[["stat_agsx"]] <- 7224 + startIdx:endIdx
     }
 
   # ---- votingAge x hisp x cenRace ---------------------------------------------
@@ -155,6 +185,7 @@ setup_margins <- function(trct_dtld = FALSE,
                              c(2, 3))
 
     if(trct_vhcr){
+  startIdx <- idx
       # Add margins at tract level
       for(i in 1:43){ # tract levels
         for(j in 1:2){ # voting age levels
@@ -168,8 +199,12 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
+  endIdx <- idx - 1
+  WLlist[["trct_vhcr"]] <- 7224 + startIdx:endIdx
     }
+
     if(cnty_vhcr){
+  startIdx <- idx
       # Add margins at county level
       for(i in 1:7){ # county levels
         for(j in 1:2){ # voting age levels
@@ -184,8 +219,12 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
+  endIdx <- idx - 1
+  WLlist[["cnty_vhcr"]] <- 7224 + startIdx:endIdx
     }
-    if(stat_vhcr){
+
+    if(cnty_vhcr){
+  startIdx <- idx
       # Add margins at state level
       for(i in 1:2){ # state levels
         for(j in 1:2){ # voting age levels
@@ -200,7 +239,9 @@ setup_margins <- function(trct_dtld = FALSE,
           }
         }
       }
-      }
+  endIdx <- idx - 1
+  WLlist[["stat_vhcr"]] <- 7224 + startIdx:endIdx
+    }
 
-  return(marPack)
+  return(list(marPack, WLlist))
 }
