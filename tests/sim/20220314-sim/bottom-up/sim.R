@@ -34,8 +34,6 @@ d <- prod(dim0) # total number of unknowns
 # number of total covariate that go in model (including specified margins)
 ndat = length(marPack) + d
 
-
-
 # vectorize true values at indices that go into model (will add noise)
 y_true <- rep(-99, ndat)
 y_true[1:d] <- c(intab)

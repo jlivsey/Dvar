@@ -1,7 +1,7 @@
 library(tidyverse, warn.conflicts = FALSE, quietly = TRUE)
 dim0 <- c(2, 2, 7, 3, 2, 43)
 
-simDir <- "~/Github/Dvar/tests/sim/20220314-sim/top-down//"
+simDir <- "~/Github/Dvar/tests/sim/20220314-sim/bottom-up///"
 nsim <- 20
 
 # ---- Load Results ----
@@ -113,7 +113,8 @@ b        <- sqrt(2) / 5 / geoMod / queryMod
 2 * b^2
 apply(c(marTru) - marEst, 2, var)
 
-# save(R, A, file = "bottomUp-forEric.RData")
+save(R, A, y_true, noise,
+     file = file.path(simDir, "20220818-bottomUp-forEric-simdate20220314.RData"))
 
 
 
