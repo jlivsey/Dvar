@@ -2,7 +2,7 @@
 
 # Define file names you want
 launchFiles <- c(
-  "launch01.R",
+  # "launch01.R",
   "launch02.R",
   "launch03.R",
   "launch04.R",
@@ -22,7 +22,7 @@ for(i in seq_along(launchFiles)){
 
   # New lines
   new_lines <- character(2)
-  new_lines[1] <- sprintf("WLidx <- WLlist[[%d]]", i)
+  new_lines[1] <- sprintf("WLidx <- WLlist_fullLen[[%d]]", i)
   new_lines[2] <- sprintf("saveFileName <- \"results%02d.RData\"", i)
 
   # Find lines to replace

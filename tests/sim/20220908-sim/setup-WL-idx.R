@@ -1,3 +1,4 @@
+load("WLlist.RData")
 
 # ---- WL 1 ----
 WL1idx <- rep(FALSE, 9105)
@@ -46,3 +47,20 @@ WL11idx[WLlist[['stat_vhcr']]] <- TRUE
 # ---- WL 12 ---
 WL12idx <- WL11idx
 WL12idx[WLlist[['stat_agsx']]] <- TRUE
+
+WLlist_fullLen <- list(
+  WL1idx,
+  WL2idx,
+  WL3idx,
+  WL4idx,
+  WL5idx,
+  WL6idx,
+  WL7idx,
+  WL8idx,
+  WL9idx,
+  WL10idx,
+  WL11idx,
+  WL12idx
+)
+
+save(WLlist_fullLen, file = "WLlist_fullLen.RData")

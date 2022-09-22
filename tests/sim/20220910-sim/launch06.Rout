@@ -1,0 +1,110 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Launch script that is basis for creating each individual launch script
+> 
+> #library(L1pack)
+> library(L1pack, lib = "~/R/x86_64-redhat-linux-gnu-library/3.3/")
+Loading required package: fastmatrix
+> 
+> load("X.RData")
+> load("WLlist_fullLen.RData")
+> load("noise.RData")
+> load("true-table.RData")
+> load("epsMod.RData")
+> 
+> # set object WLidx with vector from
+> if(FALSE){
++   WLidx <- WLlist_fullLen[[2]]
++   saveFileName <- "results02.RData"
++ }
+> WLidx <- WLlist_fullLen[[5]]
+> saveFileName <- "results05.RData"
+> 
+> # Load things that won't change over replicates
+> X_obs     <- X[WLidx, ]
+> Y_true    <- X_obs %*% c(A)
+> 
+> eps <- 12
+> epsMod_obs <- epsMod[WLidx]
+> bpar <- (1/epsMod_obs) * (1/eps)
+> W = diag(1/bpar)
+> 
+> # Initialize storage
+> numReplicates <- 10
+> repTime <- rep(NA, numReplicates)
+> coefEsts <- matrix(NA, nrow = length(c(A)), ncol = numReplicates)
+> 
+> # Main loop over number of replicates
+> for(repIdx in 1:numReplicates){
++ 
++   # Get observed values for noise of this replicate
++   noise_obs <- noise[WLidx, repIdx]
++   Y_obs <- Y_true + noise_obs
++ 
++   # Main L1 fit with timing
++   st <- Sys.time()
++   print(paste0("replication ", repIdx, " starting at: ", st))
++   fit <- l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE)
++   et <- Sys.time()
++ 
++   # Save coef ests and timing results
++   coefEsts[, repIdx] <- fit$coef
++   repTime[repIdx] <- difftime(et, st, units = 'mins')
++ 
++ }
+[1] "replication 1 starting at: 2022-09-21 11:37:28"
+[1] "replication 2 starting at: 2022-09-21 12:41:45"
+[1] "replication 3 starting at: 2022-09-21 13:47:56"
+[1] "replication 4 starting at: 2022-09-21 14:53:03"
+[1] "replication 5 starting at: 2022-09-21 15:55:50"
+[1] "replication 6 starting at: 2022-09-21 16:58:44"
+[1] "replication 7 starting at: 2022-09-21 18:03:17"
+[1] "replication 8 starting at: 2022-09-21 19:12:05"
+[1] "replication 9 starting at: 2022-09-21 20:17:07"
+[1] "replication 10 starting at: 2022-09-21 21:24:10"
+Warning messages:
+1: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+2: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+3: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+4: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+5: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+6: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+7: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+8: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+9: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+10: In l1fit(W %*% X_obs, W %*% Y_obs, int = FALSE) :
+  Non-unique solution possible
+> 
+> save.image(file = saveFileName)
+> 
+> proc.time()
+     user    system   elapsed 
+38936.651    44.909 38982.483 
