@@ -21,10 +21,12 @@ if(FALSE){
 X_obs     <- X[WLidx, ]
 Y_true    <- c(X_obs %*% c(A))
 
-eps <- 12
+eps <- 10
 epsMod_obs <- epsMod[WLidx]
 bpar <- (1/epsMod_obs) * (1/eps)
 W = diag(1/bpar)
+
+WX_obs <- W %*% X_obs
 
 # Initialize storage
 numReplicates <- 10
@@ -41,7 +43,7 @@ for(repIdx in 1:numReplicates){
   # Main L1 fit with timing
   st <- Sys.time()
   print(paste0("replication ", repIdx, " starting at: ", st))
-  fit <- l1fit(W %*% X_obs, W %*% Y_obs, intercept = FALSE)
+  fit <- l1fit(WX_obs, W %*% Y_obs, intercept = FALSE)
   et <- Sys.time()
 
   # Save coef ests and timing results
