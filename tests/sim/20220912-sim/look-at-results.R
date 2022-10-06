@@ -7,9 +7,7 @@ nsim <- 10
 # ---- Load Results ----
 simLevels <- 1:12
 
-R <- matrix(NA, 7224, length(simLevels))
 R <- array(NA, dim = c(7224, length(simLevels), nsim))
-colnames(R) <- letters[1:length(simLevels)]
 timeRunMat <- matrix(NA, nsim, length(simLevels))
 
 for(jj in seq_along(simLevels)){
@@ -23,9 +21,9 @@ for(jj in seq_along(simLevels)){
   load(file.path(simDir, fileName))
 
   # coefEsts is loaded to global workspace. Save to R and name column
-  R[, jj, ] <- t(coefEsts)
+  R[, jj, ] <- coefEsts
   simColNames <- paste0("sim", simNum_here)
-  colnames(R)[jj] <- simColNames
+  #colnames(R)[jj] <- simColNames
 
   # repTime is loaded to global workspace. Save results.
   timeRunMat[, jj] <- repTime
@@ -38,6 +36,9 @@ R[, 1, ] <- c(A) + noise[1:7224, 1:10]
 boxplot(timeRunMat)
 
 head(R)
+
+#save(R, X, WLlist_fullLen, noise, A, epsMod, timeRunMat,
+#     file = file.path(simDir, "20221006-forEric-simdate20220912.RData"))
 
 
 # ---- True Data ----
