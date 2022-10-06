@@ -1,0 +1,84 @@
+
+## Processing with Indices of new Bottom-Up files
+##  to check on number of non-slack variables in interior cell and margin 
+#-------------------------------------------------------------------------
+   9/24/2022 ff                                          
+
+R - all coefficient estimates 7224 x 12 x 10
+X - the full workload matrix 9105 x 7224
+WLlist_fullLen - list with each element a logical vector of which rows of X are included
+noise - each column is the noise associated with the i(th) replication of experiment
+A - array of true counts
+epsMod - vector of length 9105 with G * Q that was used
+timeRunMat - matrix 10 x 12 with run time of each replicate for each workload
+
+#---------------- file is "20220923-forEric-simdate20220912.RData"
+## Do work in "allCharVecList.RData", attaching the new file
+
+> ls()
+[1] "allCharVecList"
+> attach("20220923-forEric-simdate20220912.RData")
+  objects(2)
+[1] "A"              "epsMod"         "noise"          "R"             
+[5] "timeRunMat"     "WLlist_fullLen" "X"             
+
+> sapply(WLlist_fullLen, length)
+ [1] 9105 9105 9105 9105 9105 9105 9105 9105 9105 9105 9105 9105
+> sapply(WLlist_fullLen, sum)
+ [1] 7224 7310 8514 8772 8779 8793 8989 9031 9033 9037 9093 9105
+             ## sum of logicals, to find numbers of workload rows
+> for(i in 2:11) cat(sum(is.na(match(which(WLlist_fullLen[[i]]), 
+           which(WLlist_fullLen[[i]]))))," ")
+0  0  0  0  0  0  0  0  0  0     ### OK, row indices are nested as runs increase
+
+> dim(A)
+[1]  2  2  7  3  2 43      ### as before, the 7224 true values y_true in array indexing
+
+> table(X[1:7224,] %*% rep(1,7224))
+   1 
+7224 
+> table(diag(X[1:7224,]))
+   1 
+7224       ## OK, X[1:7224,] is the identity matrix diag(7224)
+
+> dim(R)
+[1] 7224   12   10
+> sum(abs(R[,1,] - c(A) - noise[1:7224,1:10]))         ### c(A) is y_true
+[1] 5.520697e-11   
+      ### good news, "sim1" case has no margins, just 7224 y_true+noise values
+
+> sapply(allCharVecList, length)
+ [1]   86 1290 1548 1562 1758 1800 1804 1860 1872 1879 1881
+> sapply(WLlist_fullLen[2:12], function(vec) sum(vec[7225:9105]))
+ [1]   86 1290 1548 1555 1569 1765 1807 1809 1813 1869 1881
+> sapply(WLlist_fullLen[2:12], sum)-7224
+ [1]   86 1290 1548 1555 1569 1765 1807 1809 1813 1869 1881
+
+### These are not the proper workload sizes !!!
+
+
+> for(i in 1:11) cat(identical(match(allCharVecList[[i]],allCharVecList[[11]]),
+          which(WLlist_fullLen[[i+1]][7225:9105])), " ")
+TRUE  TRUE  TRUE  FALSE  FALSE  FALSE  FALSE  FALSE  FALSE  FALSE  TRUE   ### Why ???
+
+> sum(!is.na(match(round(R[,1,1],6),round(R[,2,1],6))))
+[1] 717
+> sum(abs(R[,2,1] - R[,1,1]) < 1e-06)
+[1] 1                          
+   ### most cell entries in R[,2,1] are not the same as those of R[,1,1], 
+   ## and do  not match even when permuted !!!
+
+> sum(!is.na(match(round(R[,1,1],5),round(R[,3,1],5))))
+[1] 639      ###  even fewer of the fitted cells in 3rd workload, 1st run
+          ## match the true+noise cell values in the 1st run
+
+### Next try to count nonslack interior cells
+
+   nonslac_int = array(0, c(11,10), dimnames=list(paste0("WL",2:12), paste0("Rep",1:10)))
+   yobs = round(R[,1,], 6)
+   for(i in 1:11) nonslac_int[i,] = 
+      apply(abs(R[,i+1,] - yobs) < 1e-05,2,sum)
+
+## Largest values here are 2 !! There must still be an indexing mistake !!
+
+
