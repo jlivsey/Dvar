@@ -1,0 +1,132 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Launch script that is basis for creating each individual launch script
+> 
+> #library(L1pack)
+> library(L1pack, lib = "~/R/x86_64-redhat-linux-gnu-library/3.3/")
+Loading required package: fastmatrix
+> 
+> load("X.RData")
+> load("WLlist_fullLen.RData")
+> load("noise.RData")
+> load("true-table.RData")
+> load("epsMod.RData")
+> 
+> # set object WLidx with vector from
+> if(FALSE){
++   WLidx <- WLlist_fullLen[[2]]
++   saveFileName <- "results02.RData"
++ }
+> WLidx <- WLlist_fullLen[[7]]
+> saveFileName <- "results07.RData"
+> 
+> # Load things that won't change over replicates
+> X_obs     <- X[WLidx, ]
+> Y_true    <- c(X_obs %*% c(A))
+> 
+> eps <- 10
+> epsMod_obs <- epsMod[WLidx]
+> bpar <- (1/epsMod_obs) * (1/eps)
+> W = diag(1/bpar)
+> 
+> WX_obs <- W %*% X_obs
+> 
+> # Initialize storage
+> numReplicates <- 50
+> repTime <- rep(NA, numReplicates)
+> coefEsts <- matrix(NA, nrow = length(c(A)), ncol = numReplicates)
+> 
+> # Main loop over number of replicates
+> for(repIdx in 1:numReplicates){
++ 
++   # Get observed values for noise of this replicate
++   noise_obs <- noise[WLidx, repIdx]
++   Y_obs <- Y_true + noise_obs
++ 
++   # Main L1 fit with timing
++   st <- Sys.time()
++   print(paste0("replication ", repIdx, " starting at: ", st))
++   fit <- l1fit(WX_obs, W %*% Y_obs, intercept = FALSE)
++   et <- Sys.time()
++ 
++   # Save coef ests and timing results
++   coefEsts[, repIdx] <- fit$coef
++   repTime[repIdx] <- difftime(et, st, units = 'mins')
++ 
++ }
+[1] "replication 1 starting at: 2022-11-07 11:09:00"
+[1] "replication 2 starting at: 2022-11-07 12:19:02"
+[1] "replication 3 starting at: 2022-11-07 13:28:09"
+[1] "replication 4 starting at: 2022-11-07 14:36:55"
+[1] "replication 5 starting at: 2022-11-07 15:47:06"
+[1] "replication 6 starting at: 2022-11-07 16:55:54"
+[1] "replication 7 starting at: 2022-11-07 18:04:18"
+[1] "replication 8 starting at: 2022-11-07 19:12:18"
+[1] "replication 9 starting at: 2022-11-07 20:19:57"
+[1] "replication 10 starting at: 2022-11-07 21:30:36"
+[1] "replication 11 starting at: 2022-11-07 22:42:45"
+[1] "replication 12 starting at: 2022-11-07 23:48:18"
+[1] "replication 13 starting at: 2022-11-08 00:56:01"
+[1] "replication 14 starting at: 2022-11-08 02:04:47"
+[1] "replication 15 starting at: 2022-11-08 03:12:26"
+[1] "replication 16 starting at: 2022-11-08 04:17:09"
+[1] "replication 17 starting at: 2022-11-08 05:26:10"
+[1] "replication 18 starting at: 2022-11-08 06:36:21"
+[1] "replication 19 starting at: 2022-11-08 07:43:45"
+[1] "replication 20 starting at: 2022-11-08 08:50:14"
+[1] "replication 21 starting at: 2022-11-08 09:58:37"
+[1] "replication 22 starting at: 2022-11-08 11:09:03"
+[1] "replication 23 starting at: 2022-11-08 12:21:33"
+[1] "replication 24 starting at: 2022-11-08 13:36:23"
+[1] "replication 25 starting at: 2022-11-08 14:47:51"
+[1] "replication 26 starting at: 2022-11-08 16:01:28"
+[1] "replication 27 starting at: 2022-11-08 17:10:37"
+[1] "replication 28 starting at: 2022-11-08 18:19:11"
+[1] "replication 29 starting at: 2022-11-08 19:28:15"
+[1] "replication 30 starting at: 2022-11-08 20:38:24"
+[1] "replication 31 starting at: 2022-11-08 21:46:22"
+[1] "replication 32 starting at: 2022-11-08 22:54:10"
+[1] "replication 33 starting at: 2022-11-09 00:03:09"
+[1] "replication 34 starting at: 2022-11-09 01:11:43"
+[1] "replication 35 starting at: 2022-11-09 02:19:09"
+[1] "replication 36 starting at: 2022-11-09 03:27:24"
+[1] "replication 37 starting at: 2022-11-09 04:37:54"
+[1] "replication 38 starting at: 2022-11-09 05:45:50"
+[1] "replication 39 starting at: 2022-11-09 06:53:06"
+[1] "replication 40 starting at: 2022-11-09 08:00:50"
+[1] "replication 41 starting at: 2022-11-09 09:11:05"
+[1] "replication 42 starting at: 2022-11-09 10:19:08"
+[1] "replication 43 starting at: 2022-11-09 11:28:09"
+[1] "replication 44 starting at: 2022-11-09 12:36:25"
+[1] "replication 45 starting at: 2022-11-09 13:43:59"
+[1] "replication 46 starting at: 2022-11-09 14:54:05"
+[1] "replication 47 starting at: 2022-11-09 16:01:36"
+[1] "replication 48 starting at: 2022-11-09 17:11:32"
+[1] "replication 49 starting at: 2022-11-09 18:19:48"
+[1] "replication 50 starting at: 2022-11-09 19:31:28"
+There were 50 or more warnings (use warnings() to see the first 50)
+> 
+> save.image(file = saveFileName)
+> 
+> proc.time()
+     user    system   elapsed 
+207507.69     59.35 207791.67 
