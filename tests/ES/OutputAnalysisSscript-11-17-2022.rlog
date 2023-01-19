@@ -1,0 +1,520 @@
+
+Output Analysis of 50 Simulation Replication Sent 11/17/22 by James
+===================================================================
+Eric Slud                                                11/18/22
+
+# Imitate coding steps and script in OutputAnalysisScript10-07.RLog
+#   but now develop these and expand them into utility scripts
+
+## loaded 20221117-bottomUp-forEric-simdate20221105.RData
+##   after sending from Census in pieces, combined R array with 50 reps into Rarr
+
+
+> attach("20221008-forEric-simdate20221008.RData")
+> WLlist_fullLen = WLlist_fullLen
+ ## recalll list of 12 logical vectors of length 9105 telling indices of cells in workloads
+> sapply(WLlist_fullLen, sum)
+[1] 7224 7310 8514 8772 8786 8982 9024 9028 9084 9096 9103 9105
+> X = X
+> dim(X)          ## matrix of 0's and 1's for constructing margins
+[1] 9105 7224
+
+
+### Next count nonslack interior cells
+
+   nonslac_int = array(0, c(11,50), dimnames=list(paste0("WL",2:12), paste0("Rep",1:50)))
+   for(i in 1:11) nonslac_int[i,] = 
+      apply(abs(Rarr[,i+1,] - Rarr[,1,]) < 1e-08,2,sum)   ## same result with 1e-09
+  t(nonslac_int)
+Rep1  7138 6029 5875 5871 5903 5909 5902 5900 5898 5903 5902
+Rep2  7138 6028 5854 5858 5899 5888 5890 5884 5884 5882 5873
+Rep3  7138 6023 5881 5875 5882 5882 5890 5886 5883 5883 5886
+Rep4  7138 6033 5877 5884 5917 5916 5899 5895 5902 5902 5887
+Rep5  7138 6035 5870 5890 5904 5910 5907 5896 5899 5897 5891
+...
+Rep46 7138 6033 5876 5878 5907 5916 5913 5903 5908 5904 5905
+Rep47 7138 6033 5894 5879 5904 5903 5899 5886 5886 5885 5885
+Rep48 7138 6035 5876 5876 5904 5901 5889 5889 5896 5894 5884
+Rep49 7138 6039 5876 5870 5887 5886 5882 5885 5876 5878 5873
+Rep50 7138 6036 5885 5881 5914 5912 5905 5901 5901 5900 5896
+
+### There is a lot of consistency within workloads !!
+> round(rbind(mean=apply(nonslac_int,1,mean), sd=apply(nonslac_int,1,sd)), 1)
+      WL2    WL3    WL4    WL5    WL6    WL7    WL8    WL9   WL10   WL11   WL12
+mean 7138 6034.2 5877.9 5874.8 5902.4 5900.7 5897.6 5891.3 5891.7 5891.4 5890.4
+sd      0    9.5   10.0   10.3   11.4   11.0   10.5   10.2   12.4   11.3   12.6
+
+
+> mar_nonslac_lst = NULL         ### this will be a list of 11 lists of length 50
+  sim.names = paste0("sim",1:10)
+  for (i in 1:11) {
+      tmpind = which(WLlist_fullLen[[i+1]])[-(1:7224)] 
+      mar.obs = c(X[ tmpind, ] %*% c(A)) + noise[tmpind,1:50]
+      mar.dif = X[ tmpind, ] %*% Rarr[,i+1,] - mar.obs     ## K x 50
+      sim_lst = NULL
+      for(j in 1:50) sim_lst = c(sim_lst, list(which(abs(mar.dif[,j]) < 1e-8)))
+      names(sim_lst) = sim.names
+      mar_nonslac_lst = c(mar_nonslac_lst, list(sim_lst)) }
+  names(mar_nonslac_lst) = paste0("Run",2:12)
+
+  nonslac_mar = array(0, c(11,50), dimnames=list(paste0("WL",2:12), paste0("Rep",1:50)))
+  for(i in 1:11) nonslac_mar[i,] = sapply(mar_nonslac_lst[[i]], length)
+
+  t(nonslac_mar)
+      WL2  WL3  WL4  WL5  WL6  WL7  WL8  WL9 WL10 WL11 WL12
+Rep1   86 1195 1349 1353 1321 1315 1322 1324 1326 1321 1322
+Rep2   86 1196 1370 1366 1325 1336 1334 1340 1340 1342 1351
+Rep3   86 1201 1343 1349 1342 1342 1334 1338 1341 1341 1338
+Rep4   86 1191 1347 1340 1307 1308 1325 1329 1322 1322 1337
+Rep5   86 1189 1354 1334 1320 1314 1317 1328 1325 1327 1333
+Rep6   86 1187 1330 1341 1311 1323 1332 1335 1349 1346 1344
+Rep7   86 1175 1347 1347 1328 1318 1328 1327 1334 1337 1330
+Rep8   86 1212 1355 1359 1347 1347 1353 1356 1366 1355 1358
+Rep9   86 1187 1337 1337 1324 1320 1321 1339 1333 1332 1331
+Rep10  86 1181 1342 1361 1320 1337 1338 1339 1350 1339 1336
+Rep11  86 1204 1352 1364 1323 1327 1325 1342 1346 1348 1346
+Rep12  86 1188 1339 1357 1329 1329 1333 1329 1334 1321 1329
+Rep13  86 1184 1345 1349 1334 1325 1344 1349 1333 1346 1338
+Rep14  86 1189 1337 1339 1333 1329 1329 1341 1333 1337 1340
+Rep15  86 1198 1345 1352 1310 1322 1327 1333 1338 1343 1333
+Rep16  86 1174 1344 1351 1312 1320 1322 1317 1319 1318 1310
+Rep17  86 1180 1345 1344 1330 1317 1329 1336 1333 1341 1329
+Rep18  86 1189 1353 1359 1327 1329 1329 1337 1339 1346 1347
+Rep19  86 1199 1365 1364 1320 1328 1338 1345 1349 1356 1352
+Rep20  86 1202 1352 1356 1328 1324 1322 1336 1345 1341 1346
+Rep21  86 1196 1347 1344 1323 1302 1307 1323 1324 1320 1325
+Rep22  86 1187 1359 1354 1324 1325 1318 1332 1319 1327 1331
+Rep23  86 1185 1344 1341 1323 1325 1323 1334 1342 1327 1340
+Rep24  86 1180 1353 1350 1324 1325 1330 1336 1333 1332 1328
+Rep25  86 1192 1357 1353 1324 1328 1329 1339 1337 1334 1338
+Rep26  86 1191 1337 1362 1324 1325 1329 1332 1321 1331 1333
+Rep27  86 1197 1347 1343 1310 1313 1318 1331 1332 1328 1322
+Rep28  86 1187 1319 1330 1298 1309 1303 1306 1318 1306 1312
+Rep29  86 1206 1357 1361 1335 1344 1348 1352 1345 1343 1345
+Rep30  86 1187 1355 1352 1327 1327 1336 1337 1343 1341 1347
+Rep31  86 1173 1347 1342 1318 1319 1315 1337 1327 1333 1336
+Rep32  86 1181 1325 1332 1306 1309 1321 1319 1336 1325 1335
+Rep33  86 1197 1355 1357 1338 1336 1329 1340 1339 1329 1336
+Rep34  86 1176 1339 1348 1343 1340 1334 1333 1336 1339 1333
+Rep35  86 1199 1358 1359 1315 1323 1320 1331 1329 1331 1341
+Rep36  86 1186 1339 1354 1324 1332 1318 1341 1324 1331 1322
+Rep37  86 1193 1362 1361 1322 1327 1335 1340 1337 1337 1334
+Rep38  86 1196 1354 1362 1323 1324 1329 1339 1335 1345 1352
+Rep39  86 1181 1349 1359 1312 1324 1319 1325 1319 1321 1316
+Rep40  86 1213 1345 1353 1329 1333 1338 1339 1344 1339 1350
+Rep41  86 1185 1339 1333 1321 1328 1325 1326 1329 1330 1328
+Rep42  86 1174 1331 1329 1309 1307 1307 1317 1303 1308 1302
+Rep43  86 1190 1344 1354 1323 1326 1331 1329 1324 1322 1331
+Rep44  86 1174 1336 1321 1299 1304 1314 1312 1302 1315 1306
+Rep45  86 1199 1344 1350 1290 1296 1309 1309 1308 1316 1311
+Rep46  86 1191 1348 1346 1317 1308 1311 1321 1316 1320 1319
+Rep47  86 1191 1330 1345 1320 1321 1325 1338 1338 1339 1339
+Rep48  86 1189 1348 1348 1320 1323 1335 1335 1328 1330 1340
+Rep49  86 1185 1348 1354 1337 1338 1342 1339 1348 1346 1351
+Rep50  86 1188 1339 1343 1310 1312 1319 1323 1323 1324 1328
+
+> summary(c(nonslac_int+nonslac_mar))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   7224    7224    7224    7224    7224    7224    ## as expected
+
+
+## The other thing we wanted to do is examine the nonslack margins that become 
+##   slack at the next run. This is, within each sim j, the count of 
+##   mar_nonslac_lst[[i]][[j]] elements NOT in mar_nonslac_lst[[i+1]][[j]]
+
+> newslack_mar = array(0, c(10,50), dimnames=list(paste0("WL",3:12), paste0("Rep",1:50)))
+  for (i in 1:10) for (j in 1:50) newslack_mar[i,j] = 
+           length(setdiff(mar_nonslac_lst[[i]][[j]],mar_nonslac_lst[[i+1]][[j]]))
+
+  t(newslack_mar)
+      WL3 WL4 WL5 WL6 WL7 WL8 WL9 WL10 WL11 WL12
+Rep1    0 165 170 298 354 331 185  339  393  389
+Rep2    0 142 158 312 319 323 190  318  381  361
+Rep3    0 150 173 278 323 332 183  330  368  367
+Rep4    0 159 179 309 326 330 182  340  379  370
+Rep5    0 146 188 285 350 338 179  350  391  357
+Rep6    0 172 185 296 337 326 190  306  364  384
+Rep7    0 156 169 287 355 334 177  332  362  372
+Rep8    0 152 151 299 317 323 175  298  353  367
+Rep9    0 168 185 289 341 336 182  326  375  380
+Rep10   0 162 159 313 324 328 175  320  371  383
+Rep11   0 149 162 302 332 311 199  332  379  376
+Rep12   0 158 160 298 338 330 210  349  389  369
+Rep13   0 161 174 283 340 315 186  334  353  381
+Rep14   0 172 171 276 332 348 181  333  370  357
+Rep15   0 167 170 316 334 332 215  338  364  358
+Rep16   0 165 164 324 342 330 216  339  384  385
+Rep17   0 155 179 275 342 335 181  329  368  372
+Rep18   0 161 163 302 331 344 174  348  382  361
+Rep19   0 141 161 296 339 337 197  318  360  364
+Rep20   0 148 167 305 320 331 181  327  375  355
+Rep21   0 174 174 293 348 345 197  332  396  372
+Rep22   0 154 170 292 327 342 177  339  358  376
+Rep23   0 160 176 311 328 344 177  316  370  377
+Rep24   0 151 178 308 342 341 193  342  384  379
+Rep25   0 146 178 289 341 330 197  326  362  379
+Rep26   0 171 161 300 324 331 172  348  348  361
+Rep27   0 164 169 294 346 319 178  330  369  374
+Rep28   0 174 186 296 336 359 179  342  379  372
+Rep29   0 154 155 293 324 322 199  331  373  359
+Rep30   0 151 167 274 351 326 205  333  364  355
+Rep31   0 146 183 296 341 324 172  357  365  368
+Rep32   0 183 189 312 340 339 183  328  380  376
+Rep33   0 147 165 279 343 327 188  330  386  358
+Rep34   0 160 169 287 334 339 214  345  395  362
+Rep35   0 151 170 310 324 337 189  329  359  353
+Rep36   0 156 169 293 328 335 184  340  361  379
+Rep37   0 143 163 313 337 336 185  328  379  384
+Rep38   0 152 165 312 328 325 193  330  367  357
+Rep39   0 149 162 311 334 353 189  336  371  373
+Rep40   0 157 169 301 314 319 174  324  362  365
+Rep41   0 172 180 285 316 334 170  339  381  371
+Rep42   0 166 189 296 350 341 182  354  393  386
+Rep43   0 156 178 300 328 338 192  336  371  366
+Rep44   0 170 191 316 337 323 183  347  386  375
+Rep45   0 152 170 329 346 353 203  364  384  370
+Rep46   0 163 179 294 345 350 176  339  387  377
+Rep47   0 170 167 296 342 346 200  344  364  362
+Rep48   0 163 163 288 327 319 179  348  380  375
+Rep49   0 156 176 280 334 327 201  336  359  349
+Rep50   0 165 172 311 348 339 186  352  396  362
+
+#==============================================================================
+
+## Many of the next steps involve quantifying the turnover of slack cells 
+##   from one replicate to another
+
+  nonslac_chng = array(0, c(11,50,50))
+  for(i in 1:11) {
+      mat = (abs(Rarr[,i+1,] - Rarr[,1,]) > 1e-08)
+      nonslac_chng[i,,] = outer(7224-nonslac_int[i,], 
+          7224-nonslac_int[i,],"+") - 2*(t(mat)%*% mat) }
+
+## from this we learn the mean number changed across rep's
+
+> round(apply(nonslac_chng,1,sum)/(50*49),1)
+ [1]  147.9 1756.4 2147.0 2152.6 2127.3 2131.0 2134.6 2142.9 2141.5 2142.2 2143.7
+
+## A different analysis shows, by cell, the expected squared change
+##  from one rep to another
+  cell_msdiff = array(0, c(7224,11), dimnames=list(NULL, paste0("WL",2:12)))
+  for(i in 1:11) {
+      big = array(0,c(7224,50,50))
+      mat = (abs(Rarr[,i+1,] - Rarr[,1,]) > 1e-08)
+      for(j in 1:50) big[,j,] = (mat[,j] - mat)^2
+      cell_msdiff[,i] = apply(big,1,sum)/(4900) }
+
+> round(apply(cell_msdiff,2,summary),3)
+          WL2   WL3   WL4   WL5   WL6   WL7   WL8   WL9  WL10  WL11  WL12
+Min.    0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+1st Qu. 0.000 0.058 0.123 0.123 0.123 0.123 0.123 0.123 0.123 0.123 0.123
+Median  0.000 0.123 0.151 0.151 0.151 0.151 0.151 0.151 0.151 0.151 0.151
+Mean    0.010 0.122 0.149 0.149 0.147 0.147 0.148 0.148 0.148 0.148 0.148
+3rd Qu. 0.000 0.196 0.186 0.186 0.175 0.186 0.175 0.186 0.175 0.175 0.178
+Max.    0.249 0.255 0.255 0.255 0.253 0.255 0.253 0.253 0.253 0.253 0.249
+    ### very stable across workloads ! meansq change between reps is 12% to 18%
+    ### across cells
+
+> apply(cell_msdiff,2, function(col) sum(col>0))
+ WL2  WL3  WL4  WL5  WL6  WL7  WL8  WL9 WL10 WL11 WL12 
+ 904 6459 7217 7222 7221 7221 7223 7223 7221 7221 7219 
+>  par(mfrow=c(3,4))
+   for(i in 1:11)  hist(cell_msdiff[,i], prob=T, 
+          main=paste0("WL ",1+i), xlab="meansq diff")
+   ### saved as "MeanSqSlacDiff.pdf"
+ ### Can also plot mean-sq diff versus size
+> par(mfrow=c(1,1))
+  par(mfrow=c(3,4))
+  for(i in 1:11)  plot(c(A),cell_msdiff[,i], main=paste0("WL ",1+i), 
+          xlab="size", ylab="meansq diff")
+ ### surprisingly weak correlation with size
+ for(i in 1:11) cat(round(cor(c(A),cell_msdiff[,i]),3),"  ")
+-0.045   -0.111   -0.034   -0.034   -0.018   -0.006   -0.007   0.002   -0.001   0.002   -0.007 
+
+## NOTE: that these calculations tally only how relatively often the cell estimate changes
+##   slack status across rep's, not how large the changes are
+
+  cell_mschng = array(0, c(7224,11), dimnames=list(NULL, paste0("WL",2:12)))
+  for(i in 1:11) {
+      big = array(0,c(7224,50,50))
+      for(j in 1:50) big[,j,] = (Rarr[,i,j] - Rarr[,i,])^2
+      cell_mschng[,i] = apply(big,1,sum)/(4900) }
+  round(apply(cell_mschng,2,summary),3)
+           WL2     WL3    WL4    WL5    WL6    WL7    WL8    WL9   WL10   WL11   WL12
+Min.     1.552   1.621  1.621  1.766  2.094  1.902  2.016  1.983  1.851  1.653  2.307
+1st Qu.  4.305   4.437  4.981  5.518  5.616  5.573  5.606  5.563  5.626  5.627  5.618
+Median   5.340   5.612  6.436  6.933  7.072  6.931  6.973  6.974  7.030  7.027  6.996
+Mean     5.569   9.986  7.164  7.394  7.460  7.331  7.362  7.363  7.419  7.376  7.409
+3rd Qu.  6.544   7.194  8.489  8.765  8.865  8.691  8.731  8.688  8.754  8.705  8.798
+Max.    15.675 303.197 35.412 32.673 29.668 23.033 24.813 25.008 26.040 23.992 21.319
+
+ for(i in 1:11) cat(round(cor(c(A),cell_mschng[,i]),3),"  ")
+-0.012  0.021  0.117  0.161  0.163  0.107  0.098  0.094  0.089  0.075  0.086 
+   ## now positive correlation
+> par(mfrow=c(1,1))
+  par(mfrow=c(3,4))
+  for(i in 1:11)  plot(c(A),cell_mschng[,i], main=paste0("WL ",1+i), 
+          xlab="size", ylab="meansq chng")
+    ### saved as "MeanSqChng.pdf"
+
+### NEXT we can cross-tabulate entries in cell_mschng  or cell_msdiff by size-intervals, 
+##  which I do not expect to tell us much more than we can see in the saved scatterplots, 
+##  or we can try to cross-tabulate according to various properties of the 7224 interior 
+##  cells, such as how extreme are the various proportions for margins containing the cell.
+## But I did not have time to do anything with that idea yet ...
+
+
+
+#=============================================================================
+## Suggestions for tallies:
+# (i) Previously we discussed calculating (roots of) average variances 
+#    for "typical" or "large" or "small" interior cells and/or margins.
+#    It makes sense to think of doing this for interior cells and margins
+#    grouped into size-classes. (Initially we can create the size classes
+#    from the y_true sizes.)
+# (ii) We can also, as we go, tally some measure of the flux across some 
+#    number of runs (which we might make smaller than the total number of 
+#    runs from which we compute variances) of slack/nonslack status. Again,
+#    these measures might be grouped according the size-classes of interior
+#    cells or margins.
+# (iii) A possible idea in relation to (iii) is to use these slack <-> nonslack
+#    fluxes across limited numbers of runs as regression variables in 
+#    "predicting" either by regression or Machine-Learning techniques (using 
+#    gradient boosting or random forests or whatever.
+
+## WE DISCUSSED THESE THINGS BRIEFLY IN OUR MEETING OF 10/13/2022.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  10/20/22
+#  (iv) Look especially at WL8 -> WL9 transition of nonslack to slack using  
+#    size-classes to see what is going on
+
+## Scratch from 12/8/22 for week's task ahead:
+##     subsetting interior cells & margins with respect to characteristics
+#
+#  different level of implied errors based on intermediate workloads:
+#  NOTES on programming task for next week (to meet 9:30am Thursday 12/14:
+#    (a)  make lists to say which cells and margins are part of the specific margins 
+#      that we look at for implied errors at each workload stage; 
+#    (b)  will use these lists for two purposes, 
+#               (1) to tally what are the "nested" implied-error contrasts for
+#            margins based on released interior-cell and margin data (based on 
+#            earlier and current workload), from all runs for all specific margins
+#            at all workloads;
+#               (2) to calculate for those same nested implied-error contrasts 
+#            what are their variances doe to the added double-exponential noise for
+#            released data at all earlier and current workloads; these variances will
+#            be calculated for all implied errors for ll
+
+## Calculation (b)(2) uses epsilon-allocation schedule as well as the specific numbers
+#     of levels of categorical variables summed over. Calculation b(1) will still look
+#     at actual implied errors from simulated data (using actual noise values at interior
+#     and marginal cell  released values at successive workload stages.
+
+## NB: "implied error" for a higher-level margin means a contrast between the released 
+#     value of that margin and the sum of lover-level released interior cells or margins 
+#     ideally would sum up to the current released margin.
+
+# EMPHASIZE THE CODING OF (a)  THIS WEEK !
+
+#===============================================================================
+## CODING IN PREPARATION FOR MEETING Thurs 12/15
+
+## Open   20221117-bottomUp-forEric-simDate20221105.RData
+## contans all the objects above.
+
+## Recall object A is array 2x2x7x3x2x43, with dimensions 
+## OWNRENT, SEX, RACE, AGEGP3, HISP, TRACT
+
+## Recall that we need to augment the dimensions to accommodate COUNTY, STATE
+## This was done in script TablShell.RLog, using counties built from numbers 
+##    c(8,9,11,6,2,3,4) of tracts, and first 3 counties were State S1, last 4 were S2
+## NB in this way, Geography is nested but do not have same number of lower-geography 
+##    levels within each higher-geography level. Could put 11 tract levels in each 
+##    county, 4 counties in each state, with many empty.
+
+## Alternatively, we could equip each tract with county and state, through the array
+
+TractArr = array(0, c(43,2), dimnames=list(paste0("tr",1:43), c("County","State")))
+TractArr[,2] = rep(1:2, c(28,15))
+TractArr[,1] = rep(1:7, c(8,9,11,6,2,3,4))
+
+t(TractArr)
+       tr1 tr2 tr3 tr4 tr5 tr6 tr7 tr8 tr9 tr10 tr11 tr12 tr13 tr14 tr15 tr16
+County   1   1   1   1   1   1   1   1   2    2    2    2    2    2    2    2
+State    1   1   1   1   1   1   1   1   1    1    1    1    1    1    1    1
+       tr17 tr18 tr19 tr20 tr21 tr22 tr23 tr24 tr25 tr26 tr27 tr28 tr29 tr30
+County    2    3    3    3    3    3    3    3    3    3    3    3    4    4
+State     1    1    1    1    1    1    1    1    1    1    1    1    2    2
+       tr31 tr32 tr33 tr34 tr35 tr36 tr37 tr38 tr39 tr40 tr41 tr42 tr43
+County    4    4    4    4    5    5    6    6    6    7    7    7    7
+State     2    2    2    2    2    2    2    2    2    2    2    2    2
+
+
+## Now decide to represent margins according to which variables are summed over,
+##  and which fixed
+
+## list  WLlist_fullLen contains 9105 logical entries for X-rows 
+##    in 12 successive workloads, where X is 9105 x 7224 incidence matrix
+
+## Recall left-to-right dimensions in interior table A are
+##   OWNRENT=HHGQ, SEX, RACE, AGE3, HISP, TRACT
+
+## successive workloads are defined incrementally by:
+1  'trct_dtld'       interior cells only    7224
+2  'trct_hhgq'       OWNRENT x TRACT        2x43=86
+3  'trct_vhcr'       rac x vot x hisp x TR  7x2x2x43=1204
+4  'trct_agsx'       SEX x AGE3 x TRACT     2x3x43=258
+5  'cnty_hhgq'       OWNRENT x CTY          2x7 = 14
+6  'cnty_vhcr'       rac x vot x hisp x CTY 7x2x2x7 = 196
+7  'cnty_agsx'       SEX x AGE3 x CTY       2x3x7 = 42
+8  'stat_hhgq'       OWNRENT x ST           2x2 = 4
+9  'stat_vhcr'       rac x vot x hisp x ST  7x2x2x2 = 56 
+10 'stat_agsx'       SEX x AGE3 x ST        2x3x2 = 12
+11 'cnty'            CTY                    7
+12 'state'           ST                     2
+
+## NB. Misnomer to call 11 and 12 "detailed"
+##     Also: "vot" differs from other categories in pooling two AGE3GP levels
+
+## Problem now is to represent lower-level cells and margins in each released margin
+
+## For example, the 3rd row among the 196 newly entering workload 6 (not in previous workloads)
+##   should correspond to: Asian, Hisp, AGE3 levels 2:3, Cty1
+##   and we can represent this margin as:  (+,+,3,2:3,1,1:8)   vector of 6 char-strings
+
+## no lower-level margins are nested in this other than the constituent cells
+## and these are nested in rac x hisp x vot  and  CTY
+
+## the lower-level nested ones corresp. to rows of X with 1's a subset of the 1's in current row
+## So create a list with a set for each row of all earlier rows with sets of 1's.
+## However, the rows of X already show by TRUE values exactly which interior cells fall inside
+##     a specified margin, so we create in our list only the earlier subsumed rows with # > 7224
+
+MargNams = array("+", c(1881,6), dimnames=list(paste0("marg",1:1881), 
+        c("ownr","sex","rac","age3","hisp","tr")))
+  MargNams[1:86, c(1,6)] = as.character(cbind(rep(1:2,43), rep(1:43, rep(2,43))))
+
+  sapply(WLlist_fullLen,sum)-7224
+[1]    0   86 1290 1548 1562 1758 1800 1804 1860 1872 1879 1881
+
+## another way to do this:
+  library(reshape2)
+  A.num = A
+  dimnames(A.num) = list(1:2,1:2,1:7,1:3,1:2,1:43)
+
+  MargNams[1:86,c(1,6)] = as.character(data.matrix(melt(apply(A.num,c(1,6),sum))[,1:2]))
+
+## and we can generalize this second method
+  MargNams[1290+1:258,c(2,4,6)] = as.character(data.matrix(melt(apply(A.num,c(2,4,6),sum))[,1:3]))
+ 
+## But to continue this method, need to construct separate arrays of counties and states
+##    before melting
+
+  A.cty = array(0, c(2,2,7,3,2,7), dimnames=list(1:2,1:2,1:7,1:3,1:2,
+    c("1:8","9:17","18:28","29:34","35:36","37:39","40:43")))
+  trnums = cumsum(c(0,8,9,11,6,2,3,4))
+  for(j in 1:7) A.cty[,,,,,j] = apply(A.num[,,,,,(trnums[j]+1):trnums[j+1]],1:5,sum)
+
+  A.st = array(0, c(2,2,7,3,2,2), dimnames=list(1:2,1:2,1:7,1:3,1:2,c("1:28","29:43")))
+  A.st[,,,,,1] = apply(A.num[,,,,,1:28],1:5,sum)
+  A.st[,,,,,2] = apply(A.num[,,,,,29:43],1:5,sum)
+
+  MargNams[1548+1:14,c(1,6)] = as.character(data.matrix(melt(apply(A.cty,c(1,6),sum))[,1:2]))
+  MargNams[1800+1:4,c(1,6)] = as.character(data.matrix(melt(apply(A.st,c(1,6),sum))[,1:2]))
+  dimnames(A.cty)[[6]]
+[1] "1:8"   "9:17"  "18:28" "29:34" "35:36" "37:39" "40:43"
+
+> MargNams[1800+1:4,]
+         ownr sex rac age3 hisp tr 
+marg1801 "1"  "+" "+" "+"  "+"  "1"
+marg1802 "2"  "+" "+" "+"  "+"  "1"
+marg1803 "1"  "+" "+" "+"  "+"  "2"
+marg1804 "2"  "+" "+" "+"  "+"  "2"
+
+### need to fix these so that the char-strings underr "tr" are the dimnames from 
+### the 6th dimension, respectively of the A.cty and A.st arrays
+
+  MargNams[1548+1:14,6] = dimnames(A.cty)[[6]][as.numeric(MargNams[1548+1:14,6])]
+  MargNams[1548+1:14,]
+         ownr sex rac age3 hisp tr     
+marg1549 "1"  "+" "+" "+"  "+"  "1:8"  
+marg1550 "2"  "+" "+" "+"  "+"  "1:8"  
+marg1551 "1"  "+" "+" "+"  "+"  "9:17" 
+marg1552 "2"  "+" "+" "+"  "+"  "9:17" 
+marg1553 "1"  "+" "+" "+"  "+"  "18:28"
+marg1554 "2"  "+" "+" "+"  "+"  "18:28"
+marg1555 "1"  "+" "+" "+"  "+"  "29:34"
+marg1556 "2"  "+" "+" "+"  "+"  "29:34"
+marg1557 "1"  "+" "+" "+"  "+"  "35:36"
+marg1558 "2"  "+" "+" "+"  "+"  "35:36"
+marg1559 "1"  "+" "+" "+"  "+"  "37:39"
+marg1560 "2"  "+" "+" "+"  "+"  "37:39"
+marg1561 "1"  "+" "+" "+"  "+"  "40:43"
+marg1562 "2"  "+" "+" "+"  "+"  "40:43"
+
+  MargNams[1800+1:4,6] = dimnames(A.st)[[6]][as.numeric(MargNams[1800+1:4,6])]
+  MargNams[1800+1:4,]
+         ownr sex rac age3 hisp tr     
+marg1801 "1"  "+" "+" "+"  "+"  "1:28" 
+marg1802 "2"  "+" "+" "+"  "+"  "1:28" 
+marg1803 "1"  "+" "+" "+"  "+"  "29:43"
+marg1804 "2"  "+" "+" "+"  "+"  "29:43"
+
+  MargNams[1758+1:42,c(2,4,6)] = as.character(data.matrix(melt(apply(A.cty,c(2,4,6),sum))[,1:3]))
+  MargNams[1758+1:14,6] = dimnames(A.cty)[[6]][as.numeric(MargNams[1758+1:14,6])]
+
+  MargNams[1860+1:12,c(2,4,6)] = as.character(data.matrix(melt(apply(A.st,c(2,4,6),sum))[,1:3]))
+  MargNams[1860+1:12,6] = dimnames(A.st)[[6]][as.numeric(MargNams[1860+1:12,6])]
+
+## Similarly can do CTY and ST workloads 11 and 12 resp by summing out all non-geo covariates
+$$    in A.cty and A.st
+
+  MargNams[1872+1:7,6] = dimnames(A.cty)[[6]]
+  MargNams[1879+1:2,6] = dimnames(A.st)[[6]]
+
+  sapply(WLlist_fullLen,sum)-7224
+[1]    0   86 1290 1548 1562 1758 1800 1804 1860 1872 1879 1881
+
+So far filled in:
+
+1:86, XXX , 1291:1548, 1549:1562, XXX, 1759:1800, 1801:1804, XXX, 1861:1872,
+      1873:1879, 1880:1881
+
+## The ones that have not been done are are the TR, CTY and ST margins involving vot, 
+##   and for that we need new arrays in which the 2:3 levels of AGE3 (dimension 4) are
+##   rolled up into "vot"="2:3"
+
+  A.num.vot = array(0, c(2,2,7,2,2,43), dimnames=list(1:2,1:2,1:7,c("1","2:3"),1:2,1:43))
+  A.num.vot[,,,2,,] = apply(A.num[,,,2:3,,],4,sum)
+  A.cty.vot = array(0, c(2,2,7,2,2,7), dimnames=list(1:2,1:2,1:7,c("1","2:3"),1:2,
+           c("1:8","9:17","18:28","29:34","35:36","37:39","40:43")))
+  A.cty.vot[,,,2,,] = apply(A.cty[,,,2:3,,],4,sum)
+  A.st.vot = array(0, c(2,2,7,2,2,2), dimnames=list(1:2,1:2,1:7,c("1","2:3"),1:2,c("1:28","29:43")))
+  A.st.vot[,,,2,,] = apply(A.st[,,,2:3,,],4,sum)
+
+## Now with these arrays use same idea as before to fill in rac x hisp x vot x Geo workload labels
+
+  MargNams[86+1:1204, 3:6] = as.character(data.matrix(melt(apply(A.num.vot,3:6,sum))[,1:4]))
+
+  MargNams[1562+1:196, 3:6] = as.character(data.matrix(melt(apply(A.cty.vot,3:6,sum))[,1:4]))
+
+  MargNams[1804+1:56, 3:6] = as.character(data.matrix(melt(apply(A.st.vot,3:6,sum))[,1:4]))
+
+## and after doing this, we still need to convert numeric county and state levels
+##  to the right character strings from dimnames(A.cty)[[6]] and dimnames(A.st)[[6]]
+##  and also convert the vot level 2 to the string "2:3"
+
+  MargNams[1562+1:196, 6] = dimnames(A.cty.vot)[[6]][as.numeric(MargNams[1562+1:196,6])]
+  MargNams[1562+1:196, 4] = dimnames(A.cty.vot)[[4]][as.numeric(MargNams[1562+1:196,4])]
+
+  MargNams[1804+1:56, 6] = dimnames(A.st.vot)[[6]][as.numeric(MargNams[1804+1:56,6])]
+  MargNams[1804+1:56, 4] = dimnames(A.st.vot)[[4]][as.numeric(MargNams[1804+1:56,4])]
+
+##------------- I THINK THAT COMPLETES THE FILLING-IN OF THE MargNams ARRAY
+
+
+NestList = NULL   
+ ## could do this by brute force by filling out the list based on checking earlier rows of X
+ ## but it is easier to define NULL list component for rows in workloads 2:4
+ ## then e.g. for each row in OWNRENT x CTY workload list compnent is set of 
+ ##    all OWNRENT x TR rows with TR in CTY, etc.
+
