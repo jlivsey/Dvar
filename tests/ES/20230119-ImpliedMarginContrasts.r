@@ -763,5 +763,24 @@ summary(tmplm2B)$coef
 ### NB   log1p(x) = log(1+x)
 
 
+geoMod = c(0.4,0.3,0.3)
+names(geoMod) <- c('stat', 'cnty', 'trct')
+queryMod = c(0.2,0.25,0.25,0.3)
+names(queryMod) <- c('dtld', 'owrt', 'vhcr', 'agsx')
+
+
+
+y = log1p(abs(c(t(mar1[1:1872,]))))
+
+epsX = rep(epsMod[1:1872], rep(50,1872))
+
+tmplm3 = lm(y ~ log1p(margsiz) + margfac + epsX)
+summary(tmplm3)$coef
+
+
+
+
+
+
 
 
