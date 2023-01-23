@@ -10,43 +10,6 @@ setup_margins <- function(trct_dtld = FALSE,
                           stat_hhgq = FALSE,
                           stat_vhcr = FALSE,
                           stat_agsx = FALSE){
-  # ---- County recodes ----
-  # Load VA tract level data.frame
-  # source('~/github/Dvar/tests/survey/20210410-raceHisp-tarWts.R')
-
-  # Count the number of tracts in each county
-  # x_recode <- temp_x %>%
-  # count(County_name)
-  # save(x_recode, file = "tests/sim/20210429-sim/x_recode.Rdata")
-  x_recode <-
-    structure(list(
-      County_name = c(
-        "Culpeper County",
-        "Halifax County",
-        "Harrisonburg city",
-        "Hopewell city",
-        "Madison County",
-        "Northumberland County",
-        "Rockbridge County"
-      ),
-      n = c(8L, 9L, 11L, 6L, 2L, 3L, 4L)
-    ),
-    row.names = c(NA,
-                  7L),
-    class = "data.frame")
-
-  countyRecode <- matrix(-99, 7, 2)
-  countyRecode[1, ] <- c(1, x_recode$n[1])
-  idx = x_recode$n[1] + 1
-  for(i in 2:7){
-    countyRecode[i, ] <- c(idx, idx + x_recode$n[i] - 1)
-    idx <- idx + x_recode$n[i]
-  }
-
-  # ---- State recodes ----
-  stateRecode <- matrix(-99, 2, 2)
-  stateRecode[1, ] <- c(1, 28)
-  stateRecode[2, ] <- c(29, 43)
 
   # setup marPack
   marPack = list()
