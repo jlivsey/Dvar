@@ -51,6 +51,12 @@ setup_margins <- function(trct_dtld = FALSE,
   # setup marPack
   marPack = list()
 
+  # setup geoid to track marPack
+  geoidPack = tibble::tibble(
+    REGION_ID = character(),
+    REGION_TYPE = character()
+  )
+
   # Storage for workload indexing
   WLlist <- list()
   WLlist[["trct_dtld"]] <- 1:7224
@@ -59,18 +65,19 @@ setup_margins <- function(trct_dtld = FALSE,
 
   # ---- Detailed --------------------------------------------------------------------
   # Note - detailed x tract is not needed since it is included in every run
-
-  if(trct_dtld){
-    marPack[[idx]] <- list(0, 0, 0, 0, 0, 0)
-    idx <- idx + 1
-    marPack[[idx]] <- list(0, 0, 0, 0, 0, 1:10) # just a random second margin
-  }
+  # if(trct_dtld){
+  #   marPack[[idx]] <- list(0, 0, 0, 0, 0, 0)
+  #   idx <- idx + 1
+  #   marPack[[idx]] <- list(0, 0, 0, 0, 0, 1:10) # just a random second margin
+  # }
 
   if(cnty_dtld){
   startIdx <- idx
     # Add detailed margins at county level
       for(j in 1:7){  # county
         marPack[[idx]] <- list(0, 0, 0, 0, 0, countyRecode[j, 1]:countyRecode[j, 2])
+        geoidPack$REGION_ID[idx]   = j
+        geoidPack$REGION_TYPE[idx] = "COUNTY"
         idx <- idx + 1
       }
   endIdx <- idx - 1
@@ -243,5 +250,5 @@ setup_margins <- function(trct_dtld = FALSE,
   WLlist[["stat_vhcr"]] <- 7224 + startIdx:endIdx
     }
 
-  return(list(marPack, WLlist))
+  return(list(marPack = marPack, WLlist = WLlist))
 }
