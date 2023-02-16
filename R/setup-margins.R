@@ -15,9 +15,10 @@ setup_margins <- function(trct_dtld = FALSE,
   marPack = list()
 
   # setup geoid to track marPack
-  geoidPack = tibble::tibble(
-    REGION_ID = character(),
-    REGION_TYPE = character()
+  geoidPack = tibble::tibble(.rows = 1881,
+    REGION_ID = -99,
+    REGION_TYPE = "FILLME",
+
   )
 
   # Storage for workload indexing
@@ -26,7 +27,7 @@ setup_margins <- function(trct_dtld = FALSE,
 
   idx <- 1
 
-  # ---- Detailed --------------------------------------------------------------------
+  # ---- Detailed -------------------------------------------------------------
   # Note - detailed x tract is not needed since it is included in every run
   # if(trct_dtld){
   #   marPack[[idx]] <- list(0, 0, 0, 0, 0, 0)
@@ -52,6 +53,8 @@ setup_margins <- function(trct_dtld = FALSE,
     # Add detailed margins at state level
       for(j in 1:2){ # state
         marPack[[idx]] <- list(0, 0, 0, 0, 0, stateRecode[j, 1]:stateRecode[j, 2])
+        geoidPack$REGION_ID[idx]   = j
+        geoidPack$REGION_TYPE[idx] = "STATE"
         idx <- idx + 1
       }
   endIdx <- idx - 1
@@ -66,6 +69,8 @@ setup_margins <- function(trct_dtld = FALSE,
       for(i in 1:2){     # hh/gq
         for(j in 1:43){  # tract
           marPack[[idx]] <- list(i, 0, 0, 0, 0, j)
+          geoidPack$REGION_ID[idx]   = stringr::str_pad(j, 2, pad = "0")
+          geoidPack$REGION_TYPE[idx] = "TRACT"
           idx <- idx + 1
         }
       }
@@ -79,6 +84,8 @@ setup_margins <- function(trct_dtld = FALSE,
       for(i in 1:2){    # hh/gq
         for(j in 1:7){  # county
           marPack[[idx]] <- list(i, 0, 0, 0, 0, countyRecode[j, 1]:countyRecode[j, 2])
+          geoidPack$REGION_ID[idx]   = j
+          geoidPack$REGION_TYPE[idx] = "COUNTY"
           idx <- idx + 1
         }
       }
@@ -92,6 +99,8 @@ setup_margins <- function(trct_dtld = FALSE,
       for(i in 1:2){   # hhgq
         for(j in 1:2){ # state
           marPack[[idx]] <- list(i, 0, 0, 0, 0, stateRecode[j, 1]:stateRecode[j, 2])
+          geoidPack$REGION_ID[idx]   = j
+          geoidPack$REGION_TYPE[idx] = "STATE"
           idx <- idx + 1
         }
       }
@@ -108,6 +117,8 @@ setup_margins <- function(trct_dtld = FALSE,
         for(j in 1:3){ # age levels
           for(k in 1:2){ # sex levels
             marPack[[idx]] <- list(0, k, 0, j, 0, i)
+            geoidPack$REGION_ID[idx]   = stringr::str_pad(i, 2, pad = "0")
+            geoidPack$REGION_TYPE[idx] = "TRACT"
             idx <- idx + 1
           }
         }
@@ -124,6 +135,8 @@ setup_margins <- function(trct_dtld = FALSE,
           for(k in 1:2){ # sex levels
             marPack[[idx]] <- list(0, k, 0, j, 0,
                                    countyRecode[i,1]:countyRecode[i, 2])
+            geoidPack$REGION_ID[idx]   = i
+            geoidPack$REGION_TYPE[idx] = "COUNTY"
             idx <- idx + 1
           }
         }
@@ -140,6 +153,8 @@ setup_margins <- function(trct_dtld = FALSE,
           for(k in 1:2){ # sex levels
             marPack[[idx]] <- list(0, k, 0, j, 0,
                                    stateRecode[i,1]:stateRecode[i, 2])
+            geoidPack$REGION_ID[idx]   = i
+            geoidPack$REGION_TYPE[idx] = "STATE"
             idx <- idx + 1
           }
         }
@@ -164,6 +179,8 @@ setup_margins <- function(trct_dtld = FALSE,
               marPack[[idx]] <- list(0, 0, el,
                                      votingAgeRecode[j, 1]:votingAgeRecode[j, 2],
                                      k, i)
+              geoidPack$REGION_ID[idx]   = stringr::str_pad(i, 2, pad = "0")
+              geoidPack$REGION_TYPE[idx] = "TRACT"
               idx <- idx + 1
             }
           }
@@ -184,6 +201,8 @@ setup_margins <- function(trct_dtld = FALSE,
                                      votingAgeRecode[j, 1]:votingAgeRecode[j, 2],
                                      k,
                                      countyRecode[i, 1]:countyRecode[i, 2])
+              geoidPack$REGION_ID[idx]   = i
+              geoidPack$REGION_TYPE[idx] = "COUNTY"
               idx <- idx + 1
             }
           }
@@ -193,7 +212,7 @@ setup_margins <- function(trct_dtld = FALSE,
   WLlist[["cnty_vhcr"]] <- 7224 + startIdx:endIdx
     }
 
-    if(cnty_vhcr){
+    if(stat_vhcr){
   startIdx <- idx
       # Add margins at state level
       for(i in 1:2){ # state levels
@@ -204,6 +223,8 @@ setup_margins <- function(trct_dtld = FALSE,
                                      votingAgeRecode[j, 1]:votingAgeRecode[j, 2],
                                      k,
                                      stateRecode[i, 1]:stateRecode[i, 2])
+              geoidPack$REGION_ID[idx]   = i
+              geoidPack$REGION_TYPE[idx] = "STATE"
               idx <- idx + 1
             }
           }
@@ -213,5 +234,5 @@ setup_margins <- function(trct_dtld = FALSE,
   WLlist[["stat_vhcr"]] <- 7224 + startIdx:endIdx
     }
 
-  return(list(marPack = marPack, WLlist = WLlist))
+  return(list(marPack = marPack, WLlist = WLlist, geoidPack = geoidPack))
 }
