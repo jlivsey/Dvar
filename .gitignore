@@ -38,6 +38,8 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .Rproj.user
+
+
 .DS_Store
 tests/test-sim3way.pdf
 tests/test-sim3way.spin.R
@@ -47,3 +49,9 @@ tests/sim/RMSE-none.pdf
 data/pdb2020trv2_us.csv
 data/pdb2020trv2_us.zip
 tests/qr-test.pdf
+
+tests/sim/20230211-sim/results/
+tests/sim/20221008-sim/
+
+
+
