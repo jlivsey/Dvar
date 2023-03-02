@@ -1,5 +1,7 @@
 # Set parameters for sim run
 
+load("epsMod.RData")
+
 Nrep = 50
 eps = 10
 

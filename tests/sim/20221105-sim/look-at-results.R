@@ -1,38 +1,34 @@
 library(tidyverse, warn.conflicts = FALSE, quietly = TRUE)
 dim0 <- c(2, 2, 7, 3, 2, 43)
 
-simDir <- "~/Github/Dvar/tests/sim/20220912-sim"
-nsim <- 10
+simDir <- "~/Github/Dvar/tests/sim/20221105-sim"
+nsim <- 50
 
 # ---- Load Results ----
 simLevels <- 1:12
 
-R <- matrix(NA, 7224, length(simLevels))
 R <- array(NA, dim = c(7224, length(simLevels), nsim))
-colnames(R) <- letters[1:length(simLevels)]
 timeRunMat <- matrix(NA, nsim, length(simLevels))
 
 for(jj in seq_along(simLevels)){
+
   if(jj==1) next # skip the first Workload
 
   # load results workspace
   simNum_here <- simLevels[jj]
-  print(simNum_here)
   fileName <- sprintf("results%02d.RData", simNum_here)
   print(fileName)
   load(file.path(simDir, fileName))
 
   # coefEsts is loaded to global workspace. Save to R and name column
-  R[, jj, ] <- t(coefEsts)
-  simColNames <- paste0("sim", simNum_here)
-  colnames(R)[jj] <- simColNames
+  R[, jj, ] <- coefEsts
 
   # repTime is loaded to global workspace. Save results.
   timeRunMat[, jj] <- repTime
 }
 
 # Store WL coef ests to just be the observed DP values
-R[, 1, ] <- c(A) + noise[1:7224, 1:10]
+R[, 1, ] <- c(A) + noise[1:7224, 1:50]
 
 
 boxplot(timeRunMat)
@@ -118,8 +114,8 @@ b        <- sqrt(2) / 5 / geoMod / queryMod
 2 * b^2
 apply(c(marTru) - marEst, 2, var)
 
-save(R, A, y_true, noise,
-     file = file.path(simDir, "20220818-bottomUp-forEric-simdate20220314.RData"))
+save(R, A, Y_true, noise,
+     file = file.path(simDir, "20221117-bottomUp-forEric-simdate20221105.RData"))
 
 
 
