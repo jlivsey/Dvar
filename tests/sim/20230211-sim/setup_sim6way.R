@@ -28,6 +28,10 @@ eps = 10
 geoMod = c(0.4,0.3,0.3)
 queryMod = c(0.2,0.25,0.25,0.3)
 
+names(geoMod) <- c("State", "County", "Tract")
+names(queryMod) <- c("detailed_or_total", "hhgq", "votingAge_hisp_cenrace", "age_sex")
+outer(queryMod, geoMod)
+
 #' True table
 intab <- A
 
@@ -66,6 +70,13 @@ epsMod[1:d] <- epsMod_init
 # Number of internal cells associated with each tract
 d_tract_inner = prod(dim0[-6])
 
+# Construct array indexing similar to ES `MargLabs` in
+# 20230119-ImpliedMarginContasts.r
+Atrue <- array(TRUE, dim = dim(A))
+Aidx <- which(Atrue, arr.ind = TRUE)
+MargLabs_detailed <- apply(Aidx, 1, paste0, collapse="|")
+source(file.path(simDir, "setup-MargLabs.R")) # Get MargLabs object
+
 # Setup X_info matrix. We know the first 7224 rows are all detailed tract.
 #   These detailed tract are filled in and if we know the margin values already
 #   they are filled in too, otherwise NA is used.
@@ -75,7 +86,8 @@ X_info = data.frame(
   region_type = c(rep("TRACT", 7224), geoidPack$REGION_TYPE),
   query = c(rep("detailed", 7224), rep(NA, nmar)),
   geomod = c(rep(geoMod[3], 7224), rep(NA, nmar)),
-  querymod = c(rep(queryMod[1], 7224), rep(NA, nmar))
+  querymod = c(rep(queryMod[1], 7224), rep(NA, nmar)),
+  MargLabs = c(MargLabs_detailed, MargLabs)
 )
 
 # Loop over marpack and add corresponding row to X and value to y

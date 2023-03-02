@@ -1,43 +1,71 @@
-load("~/github/Dvar/tests/sim/20230123-sim/results01.RData")
-ls()
+# Top level of simulation directory
+simDir <- "~/github/Dvar/tests/sim/20230211-sim"
 
-rowIDX
-colIDX
+# Load all files needed later
+load(file.path(simDir, "RData", "X.RData"))
+load(file.path(simDir, "RData", "noise.RData"))
+load(file.path(simDir, "RData", "true-table.RData"))
+load(file.path(simDir, "RData", "epsMod.RData"))
 
+# List all results files in the results/ directory
+resultsFiles <- file.path(simDir, "results") |>
+                  list.files()
 
-# Things that change with each different subset
-tract_nums_pad <-  stringr::str_pad(1:43, 2, pad = "0")
+# grep all results files into workloads
+WL2 <- grep(pattern = "results[0-9]{2}_hhgq[.]RData", x = resultsFiles, value = TRUE)
+WL3 <- grep(pattern = "results[0-9]{2}_hhgq_votingAge_hisp_cenrace[.]RData", x = resultsFiles, value = TRUE)
+WL4 <- grep(pattern = "results[0-9]{2}_hhgq_votingAge_hisp_cenrace_age_sex[.]RData", x = resultsFiles, value = TRUE)
+WL5 <- grep(pattern = "_[0-9]{1}_hhgq[.]RData$", x = resultsFiles, value = TRUE)
+WL6 <- grep(pattern = "_[0-9]{1}_hhgq_votingAge_hisp_cenrace[.]RData$", x = resultsFiles, value = TRUE)
+WL7 <- grep(pattern = "_[0-9]{1}_hhgq_votingAge_hisp_cenrace_age_sex[.]RData$", x = resultsFiles, value = TRUE)
+WL_list = list(WL2, WL3, WL4, WL5, WL6, WL7)
 
-coefEsts_all <- matrix(nrow = 7224, ncol = 50)
+# Initialize storage for output
+R = array(NA, dim = c(7224, 7, 50))
+timeWL <- rep(NA, 6)
 
-totalTime = 0
-for(j in seq_along(tract_nums_pad)){
+# Fill workload 1 - only detailed. BLUE = released DP counts
+R[, 1, ] <- c(A) + noise[1:7224, 1:50]
 
-  regionID = tract_nums_pad[j]
+# Fill in rest of R matrix.
+for(i in seq_along(WL_list)){
 
-  saveFileName <- sprintf("results%s.RData", regionID)
-  print(saveFileName)
-  load(saveFileName)
+  WL <- WL_list[[i]]
+  timeWL[i] <- 0
 
-  totalTime = totalTime + sum(repTime)
+  for(j in seq_along(WL)){
 
-  coefEsts_all[colIDX, ] = coefEsts[1:168, ]
+      ff <- WL[j]
+      load(file.path(simDir, "results", ff))
 
+      R[colIDX, i+1, ]  <- coefEsts[, 1:50]
+
+      timeWL[i] = timeWL[i] + sum(repTime[1:50])
+
+  }
 }
 
 # Load results from full WL runs of older sim
-load("~/github/Dvar/tests/sim/20221105-sim/results04.RData")
-fullWLtime <- sum(repTime)
-fullCoefEst = coefEsts
-
-fullWLtime / totalTime
+load("~/github/Dvar/tests/sim/20221105-sim/results05.RData")
+fullCoefEst = coefEsts # 7224 x 50
 
 # Do coef ests match?
-colSet = 1:50    # replications
-rowSet = 1:7224  # coef ests
-cbind(fullCoefEst[rowSet, colSet], coefEsts_all[rowSet, colSet])
-coefDiff = fullCoefEst[rowSet, colSet] - coefEsts_all[rowSet, colSet]
+coefDiff = fullCoefEst - R[, 5, 1:50]
 sum(abs(coefDiff) > 10^(-20))
+
+
+
+
+# Run launch.R with j = 44 and w = 1 to get 1344 coefs for tracts 1-8
+#   in workload 5
+#   Compare these coefficient estimates with full run from 20221105
+save_coefEsts = coefEsts
+
+cbind(
+  decoupled = round(save_coefEsts, 3),
+  full      = round(fullCoefEst[colIDX, 1], 3),
+  diff      = round(save_coefEsts - fullCoefEst[colIDX, 1], 3)
+) |> View()
 
 
 

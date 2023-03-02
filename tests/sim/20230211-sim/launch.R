@@ -1,6 +1,7 @@
 # Launch script that is basis for creating each individual launch script
 
 library(L1pack)
+library(tidyverse)
 
 # Set working directory
 setwd("~/github/Dvar/tests/sim/20230211-sim/")
@@ -23,8 +24,11 @@ WLquery_list[[1]] <- c("detailed", "hhgq")
 WLquery_list[[2]] <- c("detailed", "hhgq", "votingAge_hisp_cenrace")
 WLquery_list[[3]] <- c("detailed", "hhgq", "votingAge_hisp_cenrace", "age_sex")
 
-for (j in 1:50) {
+for (j in 44:50) {
 for(w in 1:3){
+
+  print(paste0("Loop with j = ", j, " and w = ", w))
+
   regionID = regionID_list[[j]]
   WLquery  = WLquery_list[[w]]
 
@@ -86,6 +90,7 @@ for(w in 1:3){
 
   }
 
-  save.image(file = file.path("results", saveFileName))
+  # save.image(file = file.path("results", saveFileName))
+  save(coefEsts, repTime, colIDX, rowIDX, file = file.path("results", saveFileName))
 
 }}
