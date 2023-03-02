@@ -50,10 +50,16 @@ geoChar2geoMod <- function(geoMod, geo){
 query_of_mar <- function(mar){
   zerosMar <- lapply(mar, function(x){x[1]==0})
   zerosMar <- unlist(zerosMar)
-  if(zerosMar[2] == 1 &&
+  if(zerosMar[1] == 1 &&
+     zerosMar[2] == 1 &&
      zerosMar[3] == 1 &&
      zerosMar[4] == 1 &&
-     zerosMar[5] == 1 ){
+     zerosMar[5] == 1){
+    return("total")
+  }else if(zerosMar[2] == 1 &&
+           zerosMar[3] == 1 &&
+           zerosMar[4] == 1 &&
+           zerosMar[5] == 1 ){
     return("hhgq")
   }else if(zerosMar[1] == 1 && zerosMar[2] == 1){
     return("votingAge_hisp_cenrace")
@@ -73,7 +79,7 @@ query_of_mar <- function(mar){
 #' @export
 #'
 queryChar2queryMod <- function(queryMod, query){
-        if(query == "detailed"){
+        if(query %in% c("detailed", "total")){
                     return(queryMod[1])
   }else if(query == "hhgq"){
                     return(queryMod[2])
