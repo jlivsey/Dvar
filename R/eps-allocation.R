@@ -54,19 +54,35 @@ query_of_mar <- function(mar){
      zerosMar[2] == 1 &&
      zerosMar[3] == 1 &&
      zerosMar[4] == 1 &&
-     zerosMar[5] == 1){
+     zerosMar[5] == 1 &&
+     zerosMar[6] != 1){
     return("total")
-  }else if(zerosMar[2] == 1 &&
+  }else if(zerosMar[1] != 1 &&
+           zerosMar[2] == 1  &&
            zerosMar[3] == 1 &&
            zerosMar[4] == 1 &&
            zerosMar[5] == 1 ){
     return("hhgq")
-  }else if(zerosMar[1] == 1 && zerosMar[2] == 1){
+  }else if(zerosMar[1] == 1 &&
+           zerosMar[2] == 1 &&
+           zerosMar[3] != 1 &&
+           zerosMar[4] != 1 &&
+           zerosMar[5] != 1 ){
     return("votingAge_hisp_cenrace")
-  }else if(zerosMar[1] == 1 && zerosMar[3] == 1 && zerosMar[5] == 1){
+  }else if(zerosMar[1] == 1 &&
+           zerosMar[2] != 1 &&
+           zerosMar[3] == 1 &&
+           zerosMar[4] != 1 &&
+           zerosMar[5] == 1){
     return("age_sex")
-  }else{
+  }else if(zerosMar[1] != 1 &&
+           zerosMar[2] != 1 &&
+           zerosMar[3] != 1 &&
+           zerosMar[4] != 1 &&
+           zerosMar[5] != 1){
     return("detail")
+  }else{
+    stop("problem with query_of_mar function - didn't enter a known mar level")
   }
 }
 
