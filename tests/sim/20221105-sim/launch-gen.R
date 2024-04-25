@@ -9,11 +9,7 @@ launchFiles <- c(
   "launch05.R",
   "launch06.R",
   "launch07.R",
-  "launch08.R",
-  "launch09.R",
-  "launch10.R",
-  "launch11.R",
-  "launch12.R"
+  "launch08.R"
 )
 
 for(i in seq_along(launchFiles)){

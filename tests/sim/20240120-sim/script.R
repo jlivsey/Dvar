@@ -1,9 +1,6 @@
-library(tidyverse)
 devtools::load_all()
 
-source("~/Documents/GitHub/Dvar/tests/sim/20240120-sim/setup-rowIdx-list.R")
-source("~/Documents/GitHub/Dvar/tests/sim/20240120-sim/local_runSim_tract.R")
-
+source("setup-rowIdx-list.R")
 
 # First we run the case where detailed-tract gets a small allocation in the
 # eps schedule
@@ -12,7 +9,21 @@ eps = 1
 geoMod = c(1/3, 1/3, 1/3)
 queryMod = c(1/4, 1/4, 1/4, 1/4)
 seed = 5555
-Nrep = 2
+Nrep = 50
+
+
+# Try to run full WL
+# Small, unif, tract
+out1_full <-
+  runSim_full(
+    eps = eps,
+    geoMod = geoMod,
+    queryMod = queryMod,
+    seed = seed,
+    Nrep = Nrep
+  )
+saveRDS(out1_full, file = "out_small_unif_full.rds")
+
 
 # Small, unif, tract
 WLseq <- 1:8

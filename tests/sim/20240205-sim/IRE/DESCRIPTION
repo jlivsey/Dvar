@@ -1,0 +1,17 @@
+Package: Dvar
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.2
+Authors@R: 
+    person(given = "James",
+           family = "Livsey",
+           role = c("aut", "cre"),
+           email = "james.a.livsey@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+Imports: L1pack
+RoxygenNote: 7.1.2
+Depends: 
+    R (>= 2.10)
